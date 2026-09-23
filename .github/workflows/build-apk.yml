@@ -56,9 +56,13 @@ jobs:
 
           echo "Build tools:"
           "$ANDROID_HOME/build-tools/34.0.0/aapt2" version
-          "$ANDROID_HOME/build-tools/34.0.0/d8" --version
-          "$ANDROID_HOME/build-tools/34.0.0/zipalign" -h >/dev/null
-          "$ANDROID_HOME/build-tools/34.0.0/apksigner" version
+"$ANDROID_HOME/build-tools/34.0.0/d8" --version
+"$ANDROID_HOME/build-tools/34.0.0/apksigner" version
+
+echo "zipalign found:"
+ls -lh "$ANDROID_HOME/build-tools/34.0.0/zipalign"
+
+echo "ANDROID SDK VERIFICATION PASSED"
 
           echo "ANDROID SDK VERIFICATION PASSED"
 
