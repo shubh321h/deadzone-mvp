@@ -39,6 +39,7 @@ public class MainActivity extends Activity {
                 Boot.log("t+8s menu visible=" + game.ui.anyVisible()
                         + " state=" + game.state);
                 Boot.flush(me);
+                Boot.hide(); // boot confirmed healthy — stop covering the real UI
             }}, 8000);
         } catch (Throwable t) {
             showFatal(t);
@@ -115,4 +116,4 @@ public class MainActivity extends Activity {
         if (game != null && game.onBack()) return;
         super.onBackPressed();
     }
-    }
+}
