@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 
+import com.deadzone.core.Boot;
 import com.deadzone.core.Game;
 
 public class MainActivity extends Activity {
@@ -13,8 +14,31 @@ public class MainActivity extends Activity {
         super.onCreate(b);
         getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         try {
+            android.widget.FrameLayout root = new android.widget.FrameLayout(this);
+            setContentView(root);
+            Boot.log("activity created");
+            android.graphics.Point sz = new android.graphics.Point();
+            getWindowManager().getDefaultDisplay().getRealSize(sz);
+            Boot.log("display " + sz.x + "x" + sz.y);
+            Boot.log("building game...");
             game = new Game(this);
-            setContentView(game.buildUi());
+            Boot.log("data: " + game.data.missions.length + " missions, "
+                    + game.data.enemies.size() + " enemy types");
+            Boot.log("save: hasSave=" + game.hasSave + " lvl=" + game.save.level);
+            root.addView(game.buildUi(), 0); // under the boot overlay
+            Boot.log("game ui attached; menu visible=" + game.ui.anyVisible());
+            final MainActivity me = this;
+            root.postDelayed(new Runnable() { @Override public void run() {
+                Boot.log("t+3s menu visible=" + game.ui.anyVisible()
+                        + " panels=" + game.ui.panels.getWidth() + "x" + game.ui.panels.getHeight()
+                        + " children=" + game.ui.panels.getChildCount());
+                Boot.flush(me);
+            }}, 3000);
+            root.postDelayed(new Runnable() { @Override public void run() {
+                Boot.log("t+8s menu visible=" + game.ui.anyVisible()
+                        + " state=" + game.state);
+                Boot.flush(me);
+            }}, 8000);
         } catch (Throwable t) {
             showFatal(t);
         }

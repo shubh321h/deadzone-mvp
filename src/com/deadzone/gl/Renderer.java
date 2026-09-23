@@ -100,7 +100,11 @@ public class Renderer implements GLSurfaceView.Renderer {
 
     public Renderer(Driver driver) { this.driver = driver; }
 
+    private int frames;
     @Override public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+        com.deadzone.core.Boot.log("GL surface: "
+                + GLES30.glGetString(GLES30.GL_RENDERER) + " / "
+                + GLES30.glGetString(GLES30.GL_VERSION));
         GLES30.glClearColor(0.04f, 0.055f, 0.09f, 1f);
         GLES30.glEnable(GLES30.GL_DEPTH_TEST);
         GLES30.glDisable(GLES30.GL_CULL_FACE);
@@ -183,6 +187,9 @@ public class Renderer implements GLSurfaceView.Renderer {
     }
 
     @Override public void onDrawFrame(GL10 gl) {
+        frames++;
+        if (frames == 1 || frames == 60 || frames % 600 == 0)
+            com.deadzone.core.Boot.log("GL frame " + frames + " drawn");
         long now = System.nanoTime();
         float dt = (now - lastNs) / 1e9f;
         lastNs = now;
