@@ -1,0 +1,484 @@
+{
+  "missions": [
+    {
+      "id": 1,
+      "name": "FIRST NIGHT",
+      "loc": "Dadar streets, Mumbai",
+      "intro": "Hour 72 of the outbreak. The streets of Dadar are quiet \u2014 too quiet. Kabir says the fortified apartment block on Pancham Road is the only safe place left in this sector. Follow the green light. Reach the safehouse alive, and you make it through the night.",
+      "autoEnd": true,
+      "ambient": {
+        "walker": 8,
+        "runner": 2
+      },
+      "waves": [
+        {
+          "at": 30,
+          "walker": 3
+        }
+      ],
+      "objectives": [
+        {
+          "t": "kill",
+          "n": 10,
+          "label": "Neutralize 10 infected"
+        },
+        {
+          "t": "reach",
+          "anchor": "safehouse_door",
+          "label": "Reach the safehouse (green marker)"
+        }
+      ],
+      "loot": [
+        {
+          "t": "ammo_9mm",
+          "n": 40,
+          "at": "market"
+        },
+        {
+          "t": "ammo_5.56",
+          "n": 30,
+          "at": "market"
+        },
+        {
+          "t": "med",
+          "at": "market"
+        },
+        {
+          "t": "scrap",
+          "n": 5,
+          "at": "spawn"
+        }
+      ],
+      "rewardXp": 150,
+      "rewardScrap": 90,
+      "rewardMeds": 1,
+      "rewardParts": 0,
+      "tutorial": [
+        "LEFT JOYSTICK \u2014 move. Hold SPRINT to run.",
+        "DRAG on the right side of the screen \u2014 aim the camera.",
+        "TAP FIRE to shoot. The AR-15 fires in full auto.",
+        "HEADSHOTS deal 1.9x damage. Tap RELOAD when empty.",
+        "Follow the green marker NORTH to the safehouse."
+      ],
+      "story": "You make it to the safehouse. Dr. Rhea checks your pulse. 'Alive. Good. We lost contact with the camps three days ago. The water out there tastes wrong \u2014 people near the river are changing first.' Kabir spreads a hand-drawn map on the board. 'If we are going to survive this, we need medicines, and we need to know what is out there. Start with the market.'"
+    },
+    {
+      "id": 2,
+      "name": "THE SEARCH",
+      "loc": "Market district, Mumbai",
+      "intro": "Rhea can't operate without supplies. The old clinic block in the market district may still hold medicines \u2014 if the infected haven't beaten you to it. Collect the medical caches, and get back to the survivor camp before the horde gathers.",
+      "ambient": {
+        "walker": 8,
+        "runner": 4
+      },
+      "waves": [
+        {
+          "at": 45,
+          "walker": 4,
+          "runner": 2
+        }
+      ],
+      "objectives": [
+        {
+          "t": "collect",
+          "n": 3,
+          "tag": "med_supply",
+          "label": "Collect 3 medical supplies"
+        },
+        {
+          "t": "kill",
+          "n": 14,
+          "label": "Neutralize 14 infected"
+        }
+      ],
+      "extract": "camp",
+      "loot": [
+        {
+          "t": "ammo_9mm",
+          "n": 40,
+          "at": "market"
+        },
+        {
+          "t": "ammo_12g",
+          "n": 12,
+          "at": "market"
+        },
+        {
+          "t": "med",
+          "at": "spawn"
+        },
+        {
+          "t": "scrap",
+          "n": 6,
+          "at": "market"
+        }
+      ],
+      "points": [
+        {
+          "t": "med_supply",
+          "anchor": "market",
+          "off": [
+            4,
+            -3
+          ],
+          "label": "Medical cache",
+          "text": "First-aid kits, morphine, IV fluid. Rhea will want these."
+        },
+        {
+          "t": "med_supply",
+          "anchor": "market",
+          "off": [
+            -9,
+            5
+          ],
+          "label": "Clinic storage",
+          "text": "Sealed storage room. You are the first person in here in weeks."
+        },
+        {
+          "t": "med_supply",
+          "anchor": "spawn",
+          "off": [
+            8,
+            -12
+          ],
+          "label": "Street pharmacy",
+          "text": "Shattered glass, but the back shelf survived."
+        },
+        {
+          "t": "note",
+          "anchor": "market",
+          "off": [
+            9,
+            10
+          ],
+          "label": "Clinic log",
+          "text": "CLINIC LOG \u2014 'KX-7 trial batch leaked before lockdown. Patients near the river changed first. The water carries it. Tell anyone left: it is in the water.'"
+        }
+      ],
+      "rewardXp": 250,
+      "rewardScrap": 140,
+      "rewardMeds": 1,
+      "rewardParts": 0,
+      "rewardWeapon": "shotgun",
+      "story": "The medicines are yours, but the clinic log is what follows you home. KX-7. A 'trial batch' \u2014 that is not how a natural outbreak is described. Rhea goes pale reading it. 'That compound... it is not a virus. Someone made it.' Kabir's grin is not a good grin. 'Then we follow the shipment. Docks.'"
+    },
+    {
+      "id": 3,
+      "name": "FLOODED STREETS",
+      "loc": "North sector, Mumbai",
+      "flood": true,
+      "intro": "Storm surge took the north sector. Half of it sits under waist-deep, contaminated water \u2014 and the infected don't mind the water. They are faster in it. Scouts report supply crates scattered across the zone, and a horde building. Collect the crates. Survive the horde. Get out.",
+      "ambient": {
+        "walker": 10,
+        "runner": 4
+      },
+      "waves": [
+        {
+          "at": 20,
+          "wave": true,
+          "walker": 6,
+          "runner": 2
+        },
+        {
+          "at": 75,
+          "wave": true,
+          "walker": 8,
+          "runner": 4
+        },
+        {
+          "at": 135,
+          "wave": true,
+          "walker": 10,
+          "runner": 6,
+          "brute": 1
+        }
+      ],
+      "objectives": [
+        {
+          "t": "collect",
+          "n": 4,
+          "tag": "supply",
+          "label": "Collect 4 supply crates"
+        },
+        {
+          "t": "survive",
+          "n": 3,
+          "label": "Survive 3 horde waves"
+        }
+      ],
+      "extract": "camp",
+      "loot": [
+        {
+          "t": "ammo_5.56",
+          "n": 40,
+          "at": "flood"
+        },
+        {
+          "t": "ammo_9mm",
+          "n": 30,
+          "at": "flood"
+        },
+        {
+          "t": "med",
+          "at": "flood"
+        },
+        {
+          "t": "scrap",
+          "n": 8,
+          "at": "flood"
+        }
+      ],
+      "points": [
+        {
+          "t": "supply",
+          "anchor": "flood",
+          "off": [
+            10,
+            6
+          ],
+          "label": "Supply crate",
+          "text": "Rations and fuel. Waterlogged, but usable."
+        },
+        {
+          "t": "supply",
+          "anchor": "flood",
+          "off": [
+            -14,
+            -4
+          ],
+          "label": "Supply crate",
+          "text": "A delivery van that never got its cargo. Take it."
+        },
+        {
+          "t": "supply",
+          "anchor": "flood",
+          "off": [
+            -6,
+            -8
+          ],
+          "label": "Supply crate",
+          "text": "Stacked against a wall. Someone was stashing for this."
+        },
+        {
+          "t": "supply",
+          "anchor": "flood",
+          "off": [
+            -8,
+            -18
+          ],
+          "label": "Supply crate",
+          "text": "Half sunk. You haul it out by the strap."
+        }
+      ],
+      "rewardXp": 400,
+      "rewardScrap": 200,
+      "rewardMeds": 2,
+      "rewardParts": 2,
+      "story": "Under the water you find what the flood buried: a K2 Logistics manifest, rusted but legible. KX-7 canisters \u2014 two hundred of them \u2014 moved south through Mumbai, then NORTH. Destination: Himalaya Ridge Station. No company listed. No signature. The outbreak was not an accident. It was a delivery."
+    },
+    {
+      "id": 4,
+      "name": "THE DOCKS",
+      "loc": "Dockyard, Mumbai",
+      "intro": "The K2 containers sit stacked in the old dockyard, and something moved in them last night. The infected here are different \u2014 faster, meaner, and they fight in pairs. Find the evidence hidden across the dockyard and bring it home. Move quiet, or don't move at all.",
+      "ambient": {
+        "walker": 6,
+        "runner": 6,
+        "brute": 2
+      },
+      "waves": [
+        {
+          "at": 40,
+          "runner": 4
+        },
+        {
+          "at": 95,
+          "runner": 4,
+          "brute": 2
+        }
+      ],
+      "objectives": [
+        {
+          "t": "collect",
+          "n": 3,
+          "tag": "evidence",
+          "label": "Investigate 3 evidence points"
+        },
+        {
+          "t": "kill",
+          "n": 18,
+          "label": "Neutralize 18 infected"
+        }
+      ],
+      "extract": "camp",
+      "loot": [
+        {
+          "t": "ammo_5.56",
+          "n": 70,
+          "at": "docks"
+        },
+        {
+          "t": "ammo_12g",
+          "n": 20,
+          "at": "docks"
+        },
+        {
+          "t": "parts",
+          "n": 2,
+          "at": "docks"
+        },
+        {
+          "t": "med",
+          "at": "docks"
+        }
+      ],
+      "points": [
+        {
+          "t": "evidence",
+          "anchor": "docks",
+          "off": [
+            6,
+            4
+          ],
+          "label": "Container A-7",
+          "text": "Inside: a K2 manifest page. KX-7 canisters, 200 units, routed to 'Himalaya Ridge Station'. The ink is still fresh."
+        },
+        {
+          "t": "evidence",
+          "anchor": "docks",
+          "off": [
+            -8,
+            8
+          ],
+          "label": "Crane cabin",
+          "text": "A photo on the rail. A mountain research station \u2014 white buildings, satellite dish, a flag you do not recognize. Handwritten on the back: 'They are testing again. \u2014 V.'"
+        },
+        {
+          "t": "evidence",
+          "anchor": "docks",
+          "off": [
+            2,
+            -8
+          ],
+          "label": "Cold storage",
+          "text": "The cold storage holds bodies in K2 lab suits, tagged and dated. These are not victims. They are test subjects."
+        }
+      ],
+      "rewardXp": 600,
+      "rewardScrap": 280,
+      "rewardMeds": 1,
+      "rewardParts": 3,
+      "rewardWeapon": "sniper",
+      "story": "The manifest is damning. KX-7 was built in a Bengaluru lab and 'shipped for field evaluation' \u2014 but the route on the manifest doesn't end in Mumbai. It ends far north, in the high Himalayas. Rhea recognizes the mark on the crates: Veda Labs. 'Veda bought clinics in every major city in two years,' she says quietly. 'We need the final evidence \u2014 they guarded it at the railway yard. Something woke up out there.'"
+    },
+    {
+      "id": 5,
+      "name": "THE COLOSSUS",
+      "loc": "East railway yard, Mumbai",
+      "boss": true,
+      "intro": "The east railway yard. The K2 'final evidence' is cached in the old signal tower, and what guards it has no name \u2014 the survivors call it The Colossus. It is the size of a van, twice as angry, and it remembers being human. Take it down, take the evidence, and get out.",
+      "ambient": {
+        "walker": 8,
+        "runner": 4
+      },
+      "waves": [
+        {
+          "at": 30,
+          "walker": 6,
+          "runner": 3
+        },
+        {
+          "at": 80,
+          "runner": 5
+        },
+        {
+          "at": 130,
+          "walker": 6,
+          "brute": 2
+        }
+      ],
+      "objectives": [
+        {
+          "t": "boss",
+          "label": "Defeat The Colossus"
+        },
+        {
+          "t": "collect",
+          "n": 1,
+          "tag": "evidence",
+          "label": "Recover the final evidence"
+        }
+      ],
+      "extract": "camp",
+      "loot": [
+        {
+          "t": "ammo_5.56",
+          "n": 75,
+          "at": "spawn"
+        },
+        {
+          "t": "ammo_5.56",
+          "n": 60,
+          "at": "station",
+          "off": [
+            -12,
+            2
+          ]
+        },
+        {
+          "t": "ammo_.338",
+          "n": 30,
+          "at": "station",
+          "off": [
+            -14,
+            -3
+          ]
+        },
+        {
+          "t": "med",
+          "at": "station"
+        },
+        {
+          "t": "scrap",
+          "n": 10,
+          "at": "station"
+        },
+        {
+          "t": "ammo_5.56",
+          "n": 30,
+          "at": "camp",
+          "off": [
+            3,
+            2
+          ]
+        },
+        {
+          "t": "med",
+          "n": 1,
+          "at": "camp",
+          "off": [
+            4,
+            1
+          ]
+        }
+      ],
+      "points": [
+        {
+          "t": "evidence",
+          "anchor": "tower",
+          "off": [
+            -11,
+            0
+          ],
+          "label": "Final evidence",
+          "text": "FINAL EVIDENCE \u2014 Project KX-7 master file. Origin: Veda Labs, Ladakh Ridge Station. Subject Zero: K. Verma. 'Phase one trials complete. Urban deployment approved. Delhi first.' \u2014 Dr. S. Kulkarni. Delhi first. It was always a plan."
+        }
+      ],
+      "rewardXp": 1000,
+      "rewardScrap": 400,
+      "rewardMeds": 2,
+      "rewardParts": 5,
+      "story": "The file proves it. KX-7 was never a leak. It was a deployment \u2014 built in a hidden station high in Ladakh, seeded city by city, starting with Delhi. You survived Mumbai. The next node on the manifest is the Delhi metro corridors. Rhea looks at you: 'We ride north. The truth ends at the ridge. And so do we.' Bengaluru built it. Darjeeling buried a witness. Ladakh holds the end of the file. The road north starts tomorrow."
+    }
+  ]
+}

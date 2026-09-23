@@ -1,0 +1,8 @@
+# build outputs & signing artifacts (keystore regenerates via build.sh)
+build/
+*.apk
+*.apk.idsig
+local.properties
+.gradle/
+.idea/
+*.iml
