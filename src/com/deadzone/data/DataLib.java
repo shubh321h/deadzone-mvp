@@ -104,9 +104,27 @@ public class DataLib {
     public static DataLib load(Context ctx) {
         File dir = new File(ctx.getFilesDir(), "data");
         if (!dir.isDirectory()) dir.mkdirs();
-        boolean needCopy = true;
-        for (String f : new String[]{"weapons.json", "enemies.json", "missions.json", "upgrades.json"}) {
-            if (new File(dir, f).length() == 0) { needCopy = true; break; }
+        // refresh asset copies whenever the app version changes — otherwise an
+        // upgrade keeps running on stale mission/enemy data
+        String ver = "0";
+        try {
+            ver = String.valueOf(ctx.getPackageManager()
+                    .getPackageInfo(ctx.getPackageName(), 0).versionCode);
+        } catch (Exception ignored) { }
+        File vf = new File(dir, ".ver");
+        String have = "";
+        try {
+            java.io.FileInputStream fr = new java.io.FileInputStream(vf);
+            byte[] b = new byte[32];
+            int n = fr.read(b);
+            fr.close();
+            if (n > 0) have = new String(b, 0, n).trim();
+        } catch (Exception ignored) { }
+        boolean needCopy = !ver.equals(have);
+        if (!needCopy) {
+            for (String f : new String[]{"weapons.json", "enemies.json", "missions.json", "upgrades.json"}) {
+                if (new File(dir, f).length() == 0) { needCopy = true; break; }
+            }
         }
         if (needCopy) {
             for (String f : new String[]{"weapons.json", "enemies.json", "missions.json", "upgrades.json"}) {
@@ -122,6 +140,11 @@ public class DataLib {
                     throw new RuntimeException("asset copy failed: " + f, e);
                 }
             }
+            try {
+                java.io.FileWriter vw = new java.io.FileWriter(vf);
+                vw.write(ver);
+                vw.close();
+            } catch (Exception ignored) { }
         }
         DataLib d = new DataLib();
         d.loadAll(dir);

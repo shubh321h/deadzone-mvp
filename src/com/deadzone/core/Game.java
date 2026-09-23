@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.deadzone.audio.AudioMgr;
+import com.deadzone.MainActivity;
 import com.deadzone.data.DataLib;
 import com.deadzone.data.MissionData;
 import com.deadzone.data.SaveData;
@@ -81,9 +82,18 @@ public class Game implements Host, Renderer.Driver {
 
     // ---------------- UI wiring ----------------
 
+    public String versionName() {
+        try {
+            return act.getPackageManager().getPackageInfo(act.getPackageName(), 0).versionName;
+        } catch (Exception e) {
+            return "?";
+        }
+    }
+
     public View buildUi() {
         GLSurfaceView gl = new GLSurfaceView(act);
         gl.setEGLContextClientVersion(3);
+        gl.setEGLConfigChooser(8, 8, 8, 8, 24, 0); // explicit depth — some GPUs under-choose
         rend = new Renderer(this);
         gl.setRenderer(rend);
         gl.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
@@ -102,6 +112,15 @@ public class Game implements Host, Renderer.Driver {
     // ---------------- frame ----------------
 
     @Override public void frame(float dt, Renderer r) {
+        try {
+            frameInner(dt, r);
+        } catch (Throwable t) {
+            android.util.Log.e("DEADZONE", "gl frame error", t);
+            try { ((MainActivity) act).showFatal(t); } catch (Throwable ignored) { }
+        }
+    }
+
+    private void frameInner(float dt, Renderer r) {
         simT += dt;
         if (pendingGL != null) {
             Runnable p = pendingGL;

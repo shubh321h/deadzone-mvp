@@ -141,7 +141,9 @@ public class UI {
         title.setText("DEAD ZONE");
         title.setTypeface(Typeface.DEFAULT_BOLD);
         c.addView(title);
-        TextView sub = dim("MUMBAI  •  CHAPTER 1", 15);
+        TextView sub = dim("v" + g.versionName() + "  •  "
+                + g.data.missions.length + " missions  •  "
+                + g.data.enemies.size() + " infected types", 15);
         c.addView(sub);
         c.addView(spacer(dp(18)));
         String cont = g.hasSave ? "CONTINUE" : "NEW GAME";
