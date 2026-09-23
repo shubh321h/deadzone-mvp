@@ -21,24 +21,46 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Check Android SDK
+      - name: Locate Android SDK
         run: |
           echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
           echo "ANDROID_HOME=$ANDROID_HOME"
-          sdkmanager --version
+
+          find "$ANDROID_SDK_ROOT" -name sdkmanager -type f -print
+
+      - name: Configure Android SDK tools
+        run: |
+          SDKMANAGER="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
+
+          if [ ! -f "$SDKMANAGER" ]; then
+            SDKMANAGER=$(find "$ANDROID_SDK_ROOT/cmdline-tools" -name sdkmanager -type f | head -n 1)
+          fi
+
+          if [ -z "$SDKMANAGER" ] || [ ! -f "$SDKMANAGER" ]; then
+            echo "ERROR: sdkmanager not found"
+            exit 1
+          fi
+
+          echo "Using sdkmanager: $SDKMANAGER"
+          echo "SDKMANAGER=$SDKMANAGER" >> "$GITHUB_ENV"
+          echo "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin" >> "$GITHUB_PATH"
 
       - name: Install Android SDK 34 and Build Tools
         run: |
-          yes | sdkmanager --licenses >/dev/null || true
-          sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
+          yes | "$SDKMANAGER" --licenses || true
+          "$SDKMANAGER" "platform-tools" "platforms;android-34" "build-tools;34.0.0"
 
       - name: Verify Android SDK
         run: |
+          echo "Checking Android SDK..."
+
           test -f "$ANDROID_SDK_ROOT/platforms/android-34/android.jar"
           test -x "$ANDROID_SDK_ROOT/build-tools/34.0.0/aapt2"
           test -x "$ANDROID_SDK_ROOT/build-tools/34.0.0/d8"
           test -x "$ANDROID_SDK_ROOT/build-tools/34.0.0/zipalign"
           test -x "$ANDROID_SDK_ROOT/build-tools/34.0.0/apksigner"
+
+          echo "Android SDK verification successful"
 
       - name: Make build script executable
         run: chmod +x build.sh
