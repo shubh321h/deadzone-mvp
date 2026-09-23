@@ -1,133 +1,31 @@
-name: Build Dead Zone APK
+name: Build DEAD ZONE APK
 
 on:
-  workflow_dispatch:
   push:
-    branches:
-      - main
-
-permissions:
-  contents: read
+  workflow_dispatch:
 
 jobs:
   build:
-    name: Build Dead Zone Android APK
-    runs-on: ubuntu-24.04
-
-    env:
-      ANDROID_HOME: /usr/local/lib/android/sdk
-      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
-
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Set up Java 17
-        uses: actions/setup-java@v4
+      - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
 
-      - name: Verify Java
-        run: |
-          echo "Java:"
-          java -version
-          echo
-          echo "Javac:"
-          javac -version
-          echo
-          echo "Keytool:"
-          keytool -help >/dev/null
-          echo "Java verification passed"
+      - name: Prepare SDK directory
+        run: sudo mkdir -p /home/user && sudo chown -R $USER:$USER /home/user
 
-      - name: Verify Android SDK
-        run: |
-          echo "ANDROID_HOME=$ANDROID_HOME"
-          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
-          echo
+      - name: Fetch Android SDK (platform-34 + build-tools 34.0.0)
+        run: bash tools/setup_sdk.sh
 
-          test -d "$ANDROID_HOME"
-          test -f "$ANDROID_HOME/platforms/android-34/android.jar"
+      - name: Build signed APK
+        run: bash build.sh
 
-          test -x "$ANDROID_HOME/build-tools/34.0.0/aapt2"
-          test -x "$ANDROID_HOME/build-tools/34.0.0/d8"
-          test -x "$ANDROID_HOME/build-tools/34.0.0/zipalign"
-          test -x "$ANDROID_HOME/build-tools/34.0.0/apksigner"
-
-          echo "Android SDK:"
-          ls -ld "$ANDROID_HOME"
-          echo
-
-          echo "Android platform:"
-          ls -lh "$ANDROID_HOME/platforms/android-34/android.jar"
-          echo
-
-          echo "Build tools:"
-          "$ANDROID_HOME/build-tools/34.0.0/aapt2" version
-          "$ANDROID_HOME/build-tools/34.0.0/d8" --version
-          "$ANDROID_HOME/build-tools/34.0.0/apksigner" version
-
-          echo
-          echo "zipalign found:"
-          ls -lh "$ANDROID_HOME/build-tools/34.0.0/zipalign"
-
-          echo
-          echo "ANDROID SDK VERIFICATION PASSED"
-
-      - name: Check project files
-        run: |
-          test -f build.sh
-          test -f AndroidManifest.xml
-          test -d src
-          test -d res
-          test -d assets
-
-          echo "Project structure:"
-          ls -la
-          echo
-
-          echo "Java source files:"
-          find src -name '*.java' | sort
-          echo
-
-          echo "Java source count:"
-          find src -name '*.java' | wc -l
-
-          echo
-          echo "Asset file count:"
-          find assets -type f | wc -l
-
-      - name: Make build script executable
-        run: chmod +x build.sh
-
-      - name: Build Dead Zone APK
-        run: |
-          echo "Starting Dead Zone build..."
-          ./build.sh
-
-      - name: Verify generated APK
-        run: |
-          test -f DEADZONE_0.3.0.apk
-
-          echo "APK successfully generated:"
-          ls -lh DEADZONE_0.3.0.apk
-
-          echo
-          echo "APK file information:"
-          file DEADZONE_0.3.0.apk
-
-      - name: Verify APK signature
-        run: |
-          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify \
-            --verbose \
-            DEADZONE_0.3.0.apk
-
-          echo "APK signature verification passed"
-
-      - name: Upload APK
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: DeadZone-0.3.0-APK
-          path: DEADZONE_0.3.0.apk
-          if-no-files-found: error
-          retention-days: 30
+          name: deadzone-apk
+          path: "*.apk"
