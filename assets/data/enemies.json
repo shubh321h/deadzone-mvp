@@ -116,6 +116,26 @@
    "boss": true,
    "headMult": 2.4,
    "id": "colossus_alpha"
+  },
+  "subject_zero": {
+   "name": "Subject Zero",
+   "hp": 2400,
+   "speed": 2.8,
+   "dmg": 46,
+   "range": 3.4,
+   "cd": 2.0,
+   "detect": 38,
+   "aggro": 70,
+   "colorR": 0.52,
+   "colorG": 0.55,
+   "colorB": 0.6,
+   "scale": 3.0,
+   "score": 1200,
+   "scrapMin": 40,
+   "scrapMax": 70,
+   "boss": true,
+   "headMult": 2.4,
+   "id": "subject_zero"
   }
  }
 }

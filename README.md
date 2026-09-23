@@ -86,11 +86,11 @@ per-type zombie behavior (chase/attack/tanking/screamer/death).
 javac --release 8 -encoding UTF-8 -cp $ANDROID_HOME/platforms/android-34/android.jar \
       -d /tmp/obj $(find src tools/sim -name '*.java')
 java -cp /tmp/obj:$ANDROID_HOME/platforms/android-34/android.jar sim.Smoke assets/data
-# -> SMOKE RESULT: 165 passed, 0 failed
+# -> SMOKE RESULT: 207 passed, 0 failed
 
 The suite is randomized (ambient spawns, loot rolls), so individual runs can
-drop a late-campaign fight — placement/logic checks never flap. Expect a clean
-sweep about 9 runs out of 12.
+drop a late-campaign boss fight — placement/logic checks never flap. Expect a
+clean sweep about 10 runs out of 12.
 ```
 
 What the sim caught (all fixed): a game-breaking safehouse anchor placed
@@ -117,8 +117,10 @@ per-frame charge damage on the boss (now one hit per charge).
 
 ## Status
 
-0.2.0-DELHI — two-chapter campaign: Mumbai (5 missions) + Delhi (4 missions,
-capped by the Alpha Colossus at India Gate). Delhi is a distinct world variant
-(own seed, sandstone skyline, dry weather, CP/Ridge/Cantt anchor layout) driven
-by the data-driven `region` field. 165 smoke checks, ~11/12 full-sweep green.
-Builds to a signed ~1.1 MB APK. Next: Ladakh finale chapter, playtest polish.
+0.3.0-LADAKH — three-chapter campaign: Mumbai (5) + Delhi (4, Alpha Colossus)
++ Ladakh (3, Subject Zero at the KX-7 array under the glacier). Ladakh is a
+snow region variant (own seed, white ground, slate/monastery palette, array
+campus layout). The region system is fully data-driven (`region` field) — the
+roadmap cities (Bengaluru, Darjeeling) are now content-only work. 207 smoke
+checks, ~10/12 full-sweep green. Builds to a signed ~0.9 MB APK.
+Next: playtest polish, safehouse epilogue screen, game-pad remapping.

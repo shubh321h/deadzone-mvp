@@ -655,6 +655,15 @@
       -2,
       3
      ]
+    },
+    {
+     "t": "ammo_5.56",
+     "n": 20,
+     "at": "camp",
+     "off": [
+      4,
+      -2
+     ]
     }
    ],
    "rewardXp": 160,
@@ -952,6 +961,384 @@
      ],
      "label": "Node core",
      "text": "FINAL EVIDENCE \u2014 the Delhi node core. Manifest line 2 of 2: SUBJECT ARRAY \u2014 LADAKH RIDGE STATION. Ladakh isn't on the list of cities. It's where the list was written."
+    }
+   ]
+  },
+  {
+   "id": 10,
+   "region": "ladakh",
+   "rain": false,
+   "name": "THE ASCENT",
+   "loc": "Khardung pass, Ladakh",
+   "intro": "The pass is a white knife above the clouds. No infected followed you up the switchbacks \u2014 whatever KX-7 is, it doesn't like the cold. The station's supply line runs through the pass. Mark the route, clear the way down, and find where the road goes.",
+   "ambient": {
+    "walker": 4,
+    "runner": 4
+   },
+   "waves": [
+    {
+     "at": 50,
+     "runner": 4
+    },
+    {
+     "at": 105,
+     "walker": 5,
+     "runner": 3
+    }
+   ],
+   "objectives": [
+    {
+     "t": "collect",
+     "n": 3,
+     "tag": "evidence",
+     "label": "Mark 3 route markers"
+    },
+    {
+     "t": "kill",
+     "n": 14,
+     "label": "Neutralize 14 infected"
+    }
+   ],
+   "extract": "camp",
+   "loot": [
+    {
+     "t": "ammo_5.56",
+     "n": 70,
+     "at": "spawn"
+    },
+    {
+     "t": "ammo_5.56",
+     "n": 25,
+     "at": "market",
+     "off": [
+      3,
+      2
+     ]
+    },
+    {
+     "t": "med",
+     "at": "camp",
+     "off": [
+      2,
+      3
+     ]
+    }
+   ],
+   "rewardXp": 220,
+   "rewardScrap": 70,
+   "rewardMeds": 1,
+   "story": "The markers trace a convoy route, fresh-tracked. Cables run down the glacier like veins \u2014 the station draws its power from somewhere under the ice. Rhea: 'Down there it's not a relay. It's a campus.'",
+   "points": [
+    {
+     "t": "evidence",
+     "anchor": "market",
+     "off": [
+      4,
+      -3
+     ],
+     "label": "Pass gate marker",
+     "text": "The last convoy gate before the climb. Chains cut, not unlocked. KX-7 owns this road so completely they stopped pretending it's public."
+    },
+    {
+     "t": "evidence",
+     "anchor": "camp",
+     "off": [
+      3,
+      2
+     ],
+     "label": "Switchback cairn",
+     "text": "A surveyor's cairn, re-stacked this season. Inside the top stone: a\u8def\u7531 tag \u2014 ARRAY MAINTENANCE, 4 KM. The road ends at the dish."
+    },
+    {
+     "t": "evidence",
+     "anchor": "station",
+     "off": [
+      6,
+      4
+     ],
+     "label": "Glacier cable head",
+     "text": "Thick power cables surface here out of the ice, warm to the touch even at minus twenty. They hum toward the array like a pulse."
+    }
+   ]
+  },
+  {
+   "id": 11,
+   "region": "ladakh",
+   "rain": false,
+   "name": "THE MONASTERY",
+   "loc": "Ridge monastery, Ladakh",
+   "intro": "A working monastery, nine hundred years old, wired with new cabling. The monks are gone; the servers in the scripture hall are not. KX-7 bought the mountain's silence. Take the power cores, read what the monks left behind, and stay out of the ice caves.",
+   "ambient": {
+    "walker": 5,
+    "runner": 5,
+    "screamer": 2
+   },
+   "waves": [
+    {
+     "at": 45,
+     "runner": 5,
+     "screamer": 2
+    },
+    {
+     "at": 90,
+     "walker": 6,
+     "brute": 2
+    },
+    {
+     "at": 130,
+     "runner": 5,
+     "screamer": 3,
+     "brute": 1
+    }
+   ],
+   "objectives": [
+    {
+     "t": "collect",
+     "n": 4,
+     "tag": "evidence",
+     "label": "Recover 4 power cores"
+    },
+    {
+     "t": "kill",
+     "n": 18,
+     "label": "Neutralize 18 infected"
+    }
+   ],
+   "extract": "camp",
+   "loot": [
+    {
+     "t": "ammo_5.56",
+     "n": 80,
+     "at": "spawn"
+    },
+    {
+     "t": "ammo_12g",
+     "n": 15,
+     "at": "market",
+     "off": [
+      2,
+      -2
+     ]
+    },
+    {
+     "t": "med",
+     "at": "market",
+     "off": [
+      4,
+      1
+     ]
+    },
+    {
+     "t": "scrap",
+     "n": 10,
+     "at": "camp",
+     "off": [
+      2,
+      2
+     ]
+    },
+    {
+     "t": "ammo_5.56",
+     "n": 25,
+     "at": "station",
+     "off": [
+      -4,
+      4
+     ]
+    }
+   ],
+   "rewardXp": 260,
+   "rewardScrap": 85,
+   "rewardParts": 1,
+   "story": "The abbot's journal, final page: 'They asked for silence. We gave it too long.' Four cores hum in your pack. The ice caves below breathe in and out \u2014 and the breath counts seconds.",
+   "points": [
+    {
+     "t": "evidence",
+     "anchor": "market",
+     "off": [
+      -5,
+      4
+     ],
+     "label": "Scripture hall server",
+     "text": "Prayer wheels and rack servers, sharing one room. The drives are wiped but the labels remain: CITY NODES 1-14, DELHI SPENT, MUMBAI SPENT."
+    },
+    {
+     "t": "evidence",
+     "anchor": "market",
+     "off": [
+      4,
+      -4
+     ],
+     "label": "Abbot's ledger",
+     "text": "Nine hundred years of donors, and in the last column, payments from 'Veda Glacier Trust'. They bought the mountain's silence by the month."
+    },
+    {
+     "t": "evidence",
+     "anchor": "station",
+     "off": [
+      -6,
+      3
+     ],
+     "label": "Yard transformer",
+     "text": "Core one comes out of its housing warm. Above the yard, the dish turns \u2014 not toward the sky. Toward the ice."
+    },
+    {
+     "t": "evidence",
+     "anchor": "tower",
+     "off": [
+      2,
+      3
+     ],
+     "label": "Ice cave mouth",
+     "text": "Core four sits in a cage of fresh rebar at the cave mouth. The breathing from below is louder here. Counted, it comes to about one breath every six seconds."
+    }
+   ]
+  },
+  {
+   "id": 12,
+   "region": "ladakh",
+   "rain": false,
+   "name": "SUBJECT ZERO",
+   "boss": true,
+   "bossEnemy": "subject_zero",
+   "loc": "The KX-7 array, Ladakh",
+   "intro": "Beneath the array dish, behind a vault door older than the project, the first of them is still kept. Subject Zero \u2014 K. Verma \u2014 the hand that wrote every city on the manifest. The containment is failing because the station is dying, and it knows you are here. This is where the list ends.",
+   "ambient": {
+    "walker": 5,
+    "runner": 4
+   },
+   "waves": [
+    {
+     "at": 30,
+     "walker": 5,
+     "runner": 4
+    },
+    {
+     "at": 80,
+     "runner": 4,
+     "brute": 2
+    },
+    {
+     "at": 130,
+     "walker": 6,
+     "screamer": 3
+    }
+   ],
+   "objectives": [
+    {
+     "t": "boss",
+     "label": "Defeat Subject Zero"
+    },
+    {
+     "t": "collect",
+     "n": 1,
+     "tag": "evidence",
+     "label": "Recover the origin archive"
+    }
+   ],
+   "extract": "camp",
+   "loot": [
+    {
+     "t": "ammo_5.56",
+     "n": 75,
+     "at": "spawn"
+    },
+    {
+     "t": "ammo_5.56",
+     "n": 60,
+     "at": "station",
+     "off": [
+      -25,
+      8
+     ]
+    },
+    {
+     "t": "ammo_.338",
+     "n": 30,
+     "at": "station",
+     "off": [
+      -27,
+      -3
+     ]
+    },
+    {
+     "t": "ammo_5.56",
+     "n": 30,
+     "at": "station",
+     "off": [
+      18,
+      10
+     ]
+    },
+    {
+     "t": "med",
+     "at": "station",
+     "off": [
+      -38,
+      6
+     ]
+    },
+    {
+     "t": "scrap",
+     "n": 10,
+     "at": "station",
+     "off": [
+      2,
+      -3
+     ]
+    },
+    {
+     "t": "ammo_5.56",
+     "n": 30,
+     "at": "camp",
+     "off": [
+      3,
+      2
+     ]
+    },
+    {
+     "t": "med",
+     "n": 1,
+     "at": "camp",
+     "off": [
+      4,
+      1
+     ]
+    },
+    {
+     "t": "ammo_5.56",
+     "n": 30,
+     "at": "station",
+     "off": [
+      -40,
+      -10
+     ]
+    },
+    {
+     "t": "med",
+     "n": 1,
+     "at": "station",
+     "off": [
+      -42,
+      -12
+     ]
+    }
+   ],
+   "rewardXp": 350,
+   "rewardScrap": 100,
+   "rewardMeds": 1,
+   "rewardParts": 1,
+   "story": "Subject Zero kneels into the snow and does not rise. In the vault: the origin archive \u2014 every city, every date, one name signed at the bottom in a steady hand. K. Verma never signed it as a victim. Rhea stands a long time in the cold. 'It's over here. What we do next is ours.'",
+   "points": [
+    {
+     "t": "evidence",
+     "anchor": "camp",
+     "off": [
+      0,
+      4
+     ],
+     "label": "Origin archive",
+     "text": "FINAL EVIDENCE \u2014 the origin archive. Subject Zero: K. Verma, volunteer. The manifest wasn't a leak schedule; it was a dose schedule. Every city a trial. Ladakh was never the end \u2014 it was the pen."
     }
    ]
   }

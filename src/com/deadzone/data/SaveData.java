@@ -17,7 +17,7 @@ import java.util.Map;
  * on pause, and when the app goes to background.
  */
 public class SaveData {
-    public static final int MAX_MISSIONS = 9;
+    public static final int MAX_MISSIONS = 12;
 
     public static class WSave {
         public boolean own;

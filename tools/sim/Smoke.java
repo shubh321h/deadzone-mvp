@@ -195,9 +195,9 @@ public class Smoke implements Host {
         System.out.println("== 1. data load ==");
         s.data = DataLib.loadFromDir(dataDir);
         check(s.data.weapons.length == 4, "4 weapons loaded");
-        check(s.data.enemies.size() >= 6 && s.data.enemies.containsKey("colossus_alpha"),
+        check(s.data.enemies.size() >= 7 && s.data.enemies.containsKey("subject_zero"),
                 s.data.enemies.size() + " enemy types loaded (incl. alpha colossus)");
-        check(s.data.missions.length == 9, "9 missions loaded (2 chapters)");
+        check(s.data.missions.length == 12, "12 missions loaded (3 chapters)");
         check(s.data.upgCost[0].length == 5 && s.data.upgCost[2].length == 5, "upgrade cost tables");
         for (MissionData m : s.data.missions) {
             check(m.objectives.size() >= 1, "mission " + m.id + " has objectives");
@@ -737,7 +737,7 @@ public class Smoke implements Host {
         for (int i = 0; i < data.missions.length; i++) {
             MissionData md = data.missions[i];
             boolean won = false;
-            for (int attempt = 0; attempt < 4 && !won; attempt++) { // the game allows safehouse retries
+            for (int attempt = 0; attempt < (md.boss ? 5 : 4) && !won; attempt++) { // the game allows safehouse retries
                 if (attempt > 0) { System.out.println("  [retry] mission " + md.id); shop(); }
                 won = playMission(md);
             }
@@ -757,7 +757,7 @@ public class Smoke implements Host {
         }
         check(cleared == data.missions.length, "campaign: all " + data.missions.length + " missions cleared (progression to lvl " + save.level + ")");
         check(save.owned("sniper") && save.owned("shotgun"), "campaign: reward weapons earned");
-        check(save.unlocked(data.missions.length - 1), "chapter 2 fully unlocked");
+        check(save.unlocked(data.missions.length - 1), "all chapters unlocked");
     }
 
     /** Plays one mission to completion with a generic objective bot.
@@ -1067,7 +1067,7 @@ public class Smoke implements Host {
                         // Orbit toward the nearest ammo crate so the fight itself
                         // carries us onto a resupply (auto-pickup at 1.4 m).
                         float side = (int) (t / 2f) % 2 == 0 ? 1f : -1f; // hold the side — fast flips cancel out
-                        MissionMgr.Pickup crate = nearestCrate(60f);
+                        MissionMgr.Pickup crate = nearestCrate(75f);
                         if (crate != null) {
                             float ax = player.pos.x - boss.pos.x, az = player.pos.z - boss.pos.z;
                             float al2 = (float) Math.max(0.01f, Math.sqrt(ax * ax + az * az));

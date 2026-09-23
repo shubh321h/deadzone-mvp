@@ -159,7 +159,10 @@ public class MissionMgr {
             bossSpawned = true;
             Vec3 bp = w.anchor("station");
             h.spawnZombie(m.bossEnemy, new Vec3(bp.x, 0, bp.z));
-            h.toast("colossus_alpha".equals(m.bossEnemy) ? "THE ALPHA COLOSSUS AWAKENS" : "THE COLOSSUS AWAKENS");
+            String bt = "colossus_alpha".equals(m.bossEnemy) ? "THE ALPHA COLOSSUS AWAKENS"
+                    : "subject_zero".equals(m.bossEnemy) ? "SUBJECT ZERO BREAKS CONTAINMENT"
+                    : "THE COLOSSUS AWAKENS";
+            h.toast(bt);
             h.sfx("boss_roar");
         }
         // ambient trickle
