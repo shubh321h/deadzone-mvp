@@ -6,10 +6,18 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 jobs:
   build:
-    name: Build Android APK
+    name: Build Dead Zone Android APK
     runs-on: ubuntu-24.04
+
+    env:
+      ANDROID_HOME: /usr/local/lib/android/sdk
+      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+      JAVA_VERSION: '17'
 
     steps:
       - name: Checkout repository
@@ -21,64 +29,80 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Locate Android SDK
+      - name: Verify Java
         run: |
-          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
-          echo "ANDROID_HOME=$ANDROID_HOME"
-
-          find "$ANDROID_SDK_ROOT" -name sdkmanager -type f -print
-
-      - name: Configure Android SDK tools
-        run: |
-          SDKMANAGER="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
-
-          if [ ! -f "$SDKMANAGER" ]; then
-            SDKMANAGER=$(find "$ANDROID_SDK_ROOT/cmdline-tools" -name sdkmanager -type f | head -n 1)
-          fi
-
-          if [ -z "$SDKMANAGER" ] || [ ! -f "$SDKMANAGER" ]; then
-            echo "ERROR: sdkmanager not found"
-            exit 1
-          fi
-
-          echo "Using sdkmanager: $SDKMANAGER"
-          echo "SDKMANAGER=$SDKMANAGER" >> "$GITHUB_ENV"
-          echo "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin" >> "$GITHUB_PATH"
-
-      - name: Install Android SDK 34 and Build Tools
-        run: |
-          yes | "$SDKMANAGER" --licenses || true
-          "$SDKMANAGER" "platform-tools" "platforms;android-34" "build-tools;34.0.0"
+          java -version
+          javac -version
+          keytool -help >/dev/null
 
       - name: Verify Android SDK
         run: |
-          echo "Checking Android SDK..."
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
 
-          test -f "$ANDROID_SDK_ROOT/platforms/android-34/android.jar"
-          test -x "$ANDROID_SDK_ROOT/build-tools/34.0.0/aapt2"
-          test -x "$ANDROID_SDK_ROOT/build-tools/34.0.0/d8"
-          test -x "$ANDROID_SDK_ROOT/build-tools/34.0.0/zipalign"
-          test -x "$ANDROID_SDK_ROOT/build-tools/34.0.0/apksigner"
+          test -d "$ANDROID_HOME"
+          test -f "$ANDROID_HOME/platforms/android-34/android.jar"
 
-          echo "Android SDK verification successful"
+          test -x "$ANDROID_HOME/build-tools/34.0.0/aapt2"
+          test -x "$ANDROID_HOME/build-tools/34.0.0/d8"
+          test -x "$ANDROID_HOME/build-tools/34.0.0/zipalign"
+          test -x "$ANDROID_HOME/build-tools/34.0.0/apksigner"
+
+          echo "Android SDK:"
+          ls -ld "$ANDROID_HOME"
+
+          echo "Android platform:"
+          ls -lh "$ANDROID_HOME/platforms/android-34/android.jar"
+
+          echo "Build tools:"
+          "$ANDROID_HOME/build-tools/34.0.0/aapt2" version
+          "$ANDROID_HOME/build-tools/34.0.0/d8" --version
+          "$ANDROID_HOME/build-tools/34.0.0/zipalign" -h >/dev/null
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" version
+
+          echo "ANDROID SDK VERIFICATION PASSED"
+
+      - name: Check project files
+        run: |
+          test -f build.sh
+          test -f AndroidManifest.xml
+          test -d src
+          test -d res
+          test -d assets
+
+          echo "Project structure:"
+          ls -la
+          echo
+          echo "Source files: $(find src -name '*.java' | wc -l)"
+          echo "Asset files: $(find assets -type f | wc -l)"
 
       - name: Make build script executable
         run: chmod +x build.sh
 
-      - name: Build APK
-        env:
-          ANDROID_HOME: ${{ env.ANDROID_SDK_ROOT }}
-        run: ./build.sh
-
-      - name: Verify APK
+      - name: Build Dead Zone APK
         run: |
-          test -f DEADZONE_MVP_0.1.0.apk
-          ls -lh DEADZONE_MVP_0.1.0.apk
+          ./build.sh
+
+      - name: Verify generated APK
+        run: |
+          test -f DEADZONE_0.3.0.apk
+
+          echo "APK successfully generated:"
+          ls -lh DEADZONE_0.3.0.apk
+
+          echo "APK file information:"
+          file DEADZONE_0.3.0.apk
+
+      - name: Verify APK signature
+        run: |
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify \
+            --verbose \
+            DEADZONE_0.3.0.apk
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: DeadZone-MVP-APK
-          path: DEADZONE_MVP_0.1.0.apk
+          name: DeadZone-0.3.0-APK
+          path: DEADZONE_0.3.0.apk
           if-no-files-found: error
           retention-days: 30
