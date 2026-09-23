@@ -44,7 +44,7 @@ fi
 "$BT/apksigner" sign \
   --ks signing/keystore.jks --ks-pass pass:deadzone123 --key-pass pass:deadzone123 \
   --ks-key-alias deadzone --v1-signing-enabled true --v2-signing-enabled true \
-  --out DEADZONE_MVP_0.1.0.apk build/apk/aligned.apk
+  --out DEADZONE_0.2.0.apk build/apk/aligned.apk
 
-"$BT/apksigner" verify DEADZONE_MVP_0.1.0.apk
-echo "BUILD_OK -> $(pwd)/DEADZONE_MVP_0.1.0.apk ($(du -h DEADZONE_MVP_0.1.0.apk | cut -f1))"
+"$BT/apksigner" verify DEADZONE_0.2.0.apk
+echo "BUILD_OK -> $(pwd)/DEADZONE_0.2.0.apk ($(du -h DEADZONE_0.2.0.apk | cut -f1))"

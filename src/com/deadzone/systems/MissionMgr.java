@@ -158,8 +158,8 @@ public class MissionMgr {
         if (m.boss && !bossSpawned && t > 4f) {
             bossSpawned = true;
             Vec3 bp = w.anchor("station");
-            h.spawnZombie("colossus", new Vec3(bp.x, 0, bp.z));
-            h.toast("THE COLOSSUS AWAKENS");
+            h.spawnZombie(m.bossEnemy, new Vec3(bp.x, 0, bp.z));
+            h.toast("colossus_alpha".equals(m.bossEnemy) ? "THE ALPHA COLOSSUS AWAKENS" : "THE COLOSSUS AWAKENS");
             h.sfx("boss_roar");
         }
         // ambient trickle

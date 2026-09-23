@@ -195,8 +195,9 @@ public class Smoke implements Host {
         System.out.println("== 1. data load ==");
         s.data = DataLib.loadFromDir(dataDir);
         check(s.data.weapons.length == 4, "4 weapons loaded");
-        check(s.data.enemies.size() == 5, "5 enemy types loaded");
-        check(s.data.missions.length == 5, "5 missions loaded");
+        check(s.data.enemies.size() >= 6 && s.data.enemies.containsKey("colossus_alpha"),
+                s.data.enemies.size() + " enemy types loaded (incl. alpha colossus)");
+        check(s.data.missions.length == 9, "9 missions loaded (2 chapters)");
         check(s.data.upgCost[0].length == 5 && s.data.upgCost[2].length == 5, "upgrade cost tables");
         for (MissionData m : s.data.missions) {
             check(m.objectives.size() >= 1, "mission " + m.id + " has objectives");
@@ -489,6 +490,7 @@ public class Smoke implements Host {
         int resupplies = 0;
         float bStuckT = 0f;
         Vec3 bPrev = player.pos.clone();
+        float bOsT = 0f; Vec3 bOsP = player.pos.clone(); // net-progress watchdog
         while (t < 300f && boss.alive) {
             // --- pick target: close adds first, else the boss ---
             Zombie target = boss;
@@ -550,6 +552,9 @@ public class Smoke implements Host {
             in.sprint = true;
             // stuck fallback: force a fresh path
             if (player.pos.dist(bPrev) < 0.05f) bStuckT += 1f / 60f; else bStuckT = 0f;
+            bOsT += 1f / 60f;
+            if (player.pos.dist(bOsP) > 1.5f) { bOsP.copy(player.pos); bOsT = 0f; }
+            if (bOsT > 3f) { bStuckT = 2f; bOsT = 0f; bOsP.copy(player.pos); }
             if (bStuckT > 1.5f) {
                 bStuckT = 0f;
                 pPath = null;
@@ -732,7 +737,7 @@ public class Smoke implements Host {
         for (int i = 0; i < data.missions.length; i++) {
             MissionData md = data.missions[i];
             boolean won = false;
-            for (int attempt = 0; attempt < 3 && !won; attempt++) { // the game allows safehouse retries
+            for (int attempt = 0; attempt < 4 && !won; attempt++) { // the game allows safehouse retries
                 if (attempt > 0) { System.out.println("  [retry] mission " + md.id); shop(); }
                 won = playMission(md);
             }
@@ -750,8 +755,9 @@ public class Smoke implements Host {
             }
             check(won, "mission " + md.id + " " + md.name + " completed");
         }
-        check(cleared == 5, "campaign: all 5 missions cleared (progression to lvl " + save.level + ")");
+        check(cleared == data.missions.length, "campaign: all " + data.missions.length + " missions cleared (progression to lvl " + save.level + ")");
         check(save.owned("sniper") && save.owned("shotgun"), "campaign: reward weapons earned");
+        check(save.unlocked(data.missions.length - 1), "chapter 2 fully unlocked");
     }
 
     /** Plays one mission to completion with a generic objective bot.
@@ -765,11 +771,12 @@ public class Smoke implements Host {
         MissionMgr.InteractPoint ptGoal = null; float ptT = 0f;
         float stuckT = 0f;
         float detT = 0f;
+        float osProgT = 0f; Vec3 osPos = player.pos.clone();
         int detAxis = 0, nextAxis = 1;
         Vec3 prev = player.pos.clone();
         Vec3 lastGoal = null;
         float lastGD = 0f, noProgT = 0f;
-        float timeout = md.id == 5 ? 1000f : (md.id == 1 || md.id == 3 ? 900f : 800f);
+        float timeout = md.boss ? 1000f : (md.id == 1 || md.id == 3 ? 900f : 800f);
         while (t < timeout && mission.state == MissionMgr.RUN && !player.dead) {
             float dt = 1f / 60f;
             in.clearEdges();
@@ -1074,8 +1081,21 @@ public class Smoke implements Host {
                 } else if (bossApproach || panicRun) {
                     // keep running the objective; shoot over the shoulder —
                     // stopping to fight stragglers is what drains the loadout
+                    // ...but grabbing a crate that sits ON the route is free ammo
+                    int tot = player.mags[player.cur] + sessionAmmo[player.cur];
+                    if (tot < 45) {
+                        Vec3 am = null; float ab = 30f;
+                        for (MissionMgr.Pickup pk : mission.loot) {
+                            if (pk.taken || !pk.t.startsWith("ammo_")) continue;
+                            float d = player.pos.dist(pk.pos);
+                            if (d < ab) { ab = d; am = pk.pos; }
+                        }
+                        if (am != null) goal = am;
+                    }
                     Vec3 mv = goal != null ? pathDir(world, goal) : null;
-                    if (mv != null) {
+                    if (detT > 0f && mv != null) {
+                        applyDetourJoy(in, detAxis); // shared un-wallow kick
+                    } else if (mv != null) {
                         player.camYaw = (float) Math.atan2(-mv.x, -mv.z);
                         player.camPitch = 0f;
                         in.joyY = 1f; in.joyX = 0f;
@@ -1159,9 +1179,14 @@ public class Smoke implements Host {
                 player.useMed(this);
             }
             boolean wantsMove = (in.joyX != 0f || in.joyY != 0f);
+            // two-layer stuck detection: frozen in place, or wallowing with no
+            // net progress (oscillation defeats the per-tick check)
             if (wantsMove && player.pos.dist(prev) < 0.05f) stuckT += dt; else stuckT = 0f;
-            if (stuckT > 1.5f) {
-                stuckT = 0f; pPath = null; pPathT = 0f;
+            osProgT += dt;
+            if (player.pos.dist(osPos) > 1.5f) { osPos.copy(player.pos); osProgT = 0f; }
+            if ((stuckT > 1.5f || osProgT > 3f) && detT <= 0f) {
+                stuckT = 0f; osProgT = 0f; osPos.copy(player.pos);
+                pPath = null; pPathT = 0f;
                 detAxis = nextAxis; nextAxis = nextAxis % 4 + 1; detT = 2.5f;
             }
             if (detT > 0f) detT -= dt;

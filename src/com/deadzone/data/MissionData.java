@@ -14,6 +14,8 @@ public class MissionData {
 
     public int id;
     public String name, loc, intro, story;
+    public String region = "mumbai";      // world style variant (palette/anchors/layout)
+    public String bossEnemy = "colossus"; // which enemy the boss objective spawns
     public boolean rain = true, flood, boss, autoEnd;
     public Map<String, Integer> ambient = new LinkedHashMap<String, Integer>();
     public List<Wave> waves = new ArrayList<Wave>();
@@ -30,6 +32,8 @@ public class MissionData {
         d.id = Json.inum(m, "id", 0);
         d.name = Json.str(m, "name", "Mission");
         d.loc = Json.str(m, "loc", "");
+        d.region = Json.str(m, "region", "mumbai");
+        d.bossEnemy = Json.str(m, "bossEnemy", "colossus");
         d.intro = Json.str(m, "intro", "");
         d.story = Json.str(m, "story", "");
         d.rain = Json.bool(m, "rain", true);

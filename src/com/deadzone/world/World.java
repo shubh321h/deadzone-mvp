@@ -23,6 +23,7 @@ public class World {
     public Vec3[] open = new Vec3[0];
     public final Map<String, Vec3> anchors = new LinkedHashMap<String, Vec3>();
     public boolean rain = true, flood;
+    public String region = "mumbai";
     public int mode; // 0 = city, 1 = safehouse
     public PathGraph graph; // street network for enemy pathfinding
     public Random rnd;
@@ -35,7 +36,9 @@ public class World {
         mode = 0;
         rain = md.rain;
         flood = md.flood;
-        rnd = new Random(731217L); // same city for all Mumbai missions
+        region = md.region;
+        // same city for every mission of a region, distinct per region
+        rnd = new Random("delhi".equals(region) ? 90210L : 731217L);
 
         // open street grid (streets between 40m blocks)
         ArrayList<Vec3> pts = new ArrayList<Vec3>();
@@ -52,12 +55,22 @@ public class World {
         anchors.put("spawn", new Vec3(0, 0, 8));
         anchors.put("safehouse", new Vec3(10, 0, -66));
         anchors.put("safehouse_door", new Vec3(10, 0, -57.5f));
-        anchors.put("market", new Vec3(-70, 0, 20));
-        anchors.put("camp", new Vec3(60, 0, 70));
-        anchors.put("docks", new Vec3(30, 0, 105));
-        anchors.put("station", new Vec3(106, 0, 0));
-        anchors.put("tower", new Vec3(121, 0, 40));
-        anchors.put("flood", new Vec3(0, 0, -100));
+        if ("delhi".equals(region)) {
+            // Delhi layout: Connaught Place ring, the Ridge, cantonment arena
+            anchors.put("market", new Vec3(-60, 0, -70));   // Connaught Place bazaar
+            anchors.put("camp", new Vec3(60, 0, -60));      // the Ridge camp
+            anchors.put("docks", new Vec3(30, 0, 105));     // unused in Delhi missions
+            anchors.put("station", new Vec3(100, 0, 10));   // India Gate arena
+            anchors.put("tower", new Vec3(121, 0, 40));
+            anchors.put("flood", new Vec3(0, 0, -100));     // unused in Delhi missions
+        } else {
+            anchors.put("market", new Vec3(-70, 0, 20));
+            anchors.put("camp", new Vec3(60, 0, 70));
+            anchors.put("docks", new Vec3(30, 0, 105));
+            anchors.put("station", new Vec3(106, 0, 0));
+            anchors.put("tower", new Vec3(121, 0, 40));
+            anchors.put("flood", new Vec3(0, 0, -100));
+        }
 
         // make sure every objective anchor is a standable spot
         for (java.util.Map.Entry<String, Vec3> e : anchors.entrySet()) {
@@ -68,9 +81,12 @@ public class World {
         }
 
         r.beginStatic();
-        // ground (wet asphalt)
-        float gc = flood ? 0.13f : 0.10f;
-        r.addBox(0, -0.25f, 0, 0, 0, 320, 0.5f, 320, gc, gc + 0.01f, gc + 0.03f);
+        // ground: wet asphalt in Mumbai, dry dust in Delhi
+        float gc = flood ? 0.13f : ("delhi".equals(region) ? 0.15f : 0.10f);
+        if ("delhi".equals(region))
+            r.addBox(0, -0.25f, 0, 0, 0, 320, 0.5f, 320, gc + 0.045f, gc + 0.02f, gc);
+        else
+            r.addBox(0, -0.25f, 0, 0, 0, 320, 0.5f, 320, gc, gc + 0.01f, gc + 0.03f);
         if (flood) {
             r.addBox(0, 0.06f, -102, 0, 0, 280, 0.22f, 46, 0.05f, 0.08f, 0.12f); // flooded north strip
         }
@@ -79,7 +95,7 @@ public class World {
         drawSafehouseTower(r);
         drawMarket(r);
         drawCamp(r);
-        drawDocks(r);
+        if (!"delhi".equals(region)) drawDocks(r); // Mumbai dockyard visual only
         drawStation(r);
         drawStreetProps(r);
         r.endStatic();
@@ -99,6 +115,11 @@ public class World {
         if (t < 20) return true;
         t = new Vec3(bx, 0, bz).dist(sp);
         if (t < 24) return true;
+        if ("delhi".equals(region)) {
+            if (bx > 80 && bz > -30 && bz < 50) return true; // cantonment arena
+            if (bz < -40 && bx > 30) return true;            // the Ridge
+            return false;
+        }
         if (bx > 80 && Math.abs(bz) < 62) return true;  // railway yard
         if (bz > 80) return true;                       // dockyard
         return false;
@@ -106,10 +127,15 @@ public class World {
 
     private void drawBuildings(Renderer r) {
         int[] cx = {-110, -70, -30, 10, 50, 90};
-        float[][] pal = {
+        boolean delhi = "delhi".equals(region);
+        float[][] pal = new float[][]{
             {0.28f, 0.28f, 0.30f}, {0.32f, 0.26f, 0.22f}, {0.30f, 0.30f, 0.26f},
             {0.24f, 0.27f, 0.30f}, {0.33f, 0.31f, 0.28f}, {0.26f, 0.24f, 0.28f},
         };
+        if (delhi) // sandstone, concrete, sun-bleached plaster
+            pal = new float[][]{ {0.45f, 0.38f, 0.28f}, {0.40f, 0.34f, 0.26f}, {0.36f, 0.32f, 0.30f},
+                {0.30f, 0.28f, 0.26f}, {0.44f, 0.40f, 0.32f}, {0.34f, 0.30f, 0.24f} };
+        Vec3 core = delhi ? anchors.get("market") : new Vec3(0, 0, -30); // dense tall core
         for (int bx : cx) {
             for (int bz : cx) {
                 if (clearBlock(bx, bz)) continue;
@@ -117,9 +143,10 @@ public class World {
                 for (int i = 0; i < n; i++) {
                     float w = 10 + rnd.nextFloat() * 13;
                     float d = 10 + rnd.nextFloat() * 13;
-                    float h = 8 + rnd.nextFloat() * 13;
-                    float dx = new Vec3(bx, 0, bz).dist(new Vec3(0, 0, -30));
-                    if (dx < 70) h += rnd.nextFloat() * 8; // denser taller core
+                    // Delhi: lower, wider sprawl; Mumbai: tower blocks
+                    float h = delhi ? 6 + rnd.nextFloat() * 9 : 8 + rnd.nextFloat() * 13;
+                    float dx = new Vec3(bx, 0, bz).dist(core);
+                    if (dx < 70) h += rnd.nextFloat() * 8;
                     float x = bx + (rnd.nextFloat() - 0.5f) * 12;
                     float z = bz + (rnd.nextFloat() - 0.5f) * 12;
                     float[] c = pal[rnd.nextInt(pal.length)];
