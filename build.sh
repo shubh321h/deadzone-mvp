@@ -34,13 +34,15 @@ echo "== package =="
 
 echo "== sign =="
 JH=$(dirname $(dirname $(readlink -f $(which javac))))
-if [ ! -f build/keystore.jks ]; then
-  "$JH/bin/keytool" -genkeypair -keystore build/keystore.jks -alias deadzone -keyalg RSA -keysize 2048 \
+mkdir -p signing
+if [ ! -f signing/keystore.jks ]; then
+  echo "== keystore: generating signing/keystore.jks (persisted) =="
+  "$JH/bin/keytool" -genkeypair -keystore signing/keystore.jks -alias deadzone -keyalg RSA -keysize 2048 \
     -validity 10000 -storepass deadzone123 -keypass deadzone123 \
     -dname "CN=Dead Zone, OU=Dev, O=DeadZone, L=Lucknow, ST=UP, C=IN" >/dev/null 2>&1
 fi
 "$BT/apksigner" sign \
-  --ks build/keystore.jks --ks-pass pass:deadzone123 --key-pass pass:deadzone123 \
+  --ks signing/keystore.jks --ks-pass pass:deadzone123 --key-pass pass:deadzone123 \
   --ks-key-alias deadzone --v1-signing-enabled true --v2-signing-enabled true \
   --out DEADZONE_MVP_0.1.0.apk build/apk/aligned.apk
 
