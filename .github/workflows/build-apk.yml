@@ -1,0 +1,51 @@
+name: Build Dead Zone APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build Android APK
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK 34 and Build Tools
+        run: |
+          sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
+          yes | sdkmanager --licenses || true
+
+      - name: Make build script executable
+        run: chmod +x build.sh
+
+      - name: Build APK
+        env:
+          ANDROID_HOME: ${{ env.ANDROID_SDK_ROOT }}
+        run: ./build.sh
+
+      - name: Verify APK
+        run: |
+          test -f DEADZONE_MVP_0.1.0.apk
+          ls -lh DEADZONE_MVP_0.1.0.apk
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: DeadZone-MVP-APK
+          path: DEADZONE_MVP_0.1.0.apk
+          if-no-files-found: error
+          retention-days: 30
