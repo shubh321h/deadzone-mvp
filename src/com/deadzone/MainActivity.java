@@ -16,6 +16,7 @@ public class MainActivity extends Activity {
         try {
             android.widget.FrameLayout root = new android.widget.FrameLayout(this);
             setContentView(root);
+            root.addView(Boot.overlay(this)); // was never attached: on-screen boot log was invisible
             Boot.log("activity created");
             android.graphics.Point sz = new android.graphics.Point();
             getWindowManager().getDefaultDisplay().getRealSize(sz);
@@ -44,8 +45,12 @@ public class MainActivity extends Activity {
         }
     }
 
-    /** Full-screen crash report — a boot failure must never be a silent black screen. */
-    public void showFatal(Throwable t) {
+    /** Full-screen crash report — a boot failure must never be a silent black screen.
+     *  May be called from the GL thread (Renderer/Game) or the UI thread; always
+     *  hops to the UI thread before touching any View, or this method itself
+     *  throws CalledFromWrongThreadException and gets swallowed by a caller's
+     *  catch-all, which is exactly how the black screen happened. */
+    public void showFatal(final Throwable t) {
         android.util.Log.e("DEADZONE", "fatal", t);
         java.io.StringWriter sw = new java.io.StringWriter();
         t.printStackTrace(new java.io.PrintWriter(sw));
@@ -55,6 +60,14 @@ public class MainActivity extends Activity {
             fw.write(sw.toString());
             fw.close();
         } catch (Exception ignored) { }
+        if (Thread.currentThread() != getMainLooper().getThread()) {
+            runOnUiThread(new Runnable() { @Override public void run() { showFatalOnUi(t, sw.toString()); } });
+        } else {
+            showFatalOnUi(t, sw.toString());
+        }
+    }
+
+    private void showFatalOnUi(Throwable t, String stackText) {
         android.widget.ScrollView sv = new android.widget.ScrollView(this);
         android.widget.LinearLayout l = new android.widget.LinearLayout(this);
         l.setOrientation(android.widget.LinearLayout.VERTICAL);
@@ -65,8 +78,7 @@ public class MainActivity extends Activity {
         h.setTextColor(0xFFFF5A52);
         h.setTextSize(16);
         android.widget.TextView tv = new android.widget.TextView(this);
-        String st = sw.toString();
-        tv.setText(st.substring(0, Math.min(st.length(), 3500)));
+        tv.setText(stackText.substring(0, Math.min(stackText.length(), 3500)));
         tv.setTextColor(0xFFFFD9D9);
         tv.setTextSize(11);
         tv.setTypeface(android.graphics.Typeface.MONOSPACE);
@@ -103,4 +115,4 @@ public class MainActivity extends Activity {
         if (game != null && game.onBack()) return;
         super.onBackPressed();
     }
-}
+    }
