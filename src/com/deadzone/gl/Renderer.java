@@ -101,7 +101,31 @@ public class Renderer implements GLSurfaceView.Renderer {
     public Renderer(Driver driver) { this.driver = driver; }
 
     private int frames;
+    private boolean fatal;
+
     @Override public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+        try {
+            onSurfaceCreatedInner(gl, config);
+        } catch (Throwable t) {
+            fatal = true;
+            android.util.Log.e("DEADZONE", "gl surface create error", t);
+            reportFatal(t);
+        }
+    }
+
+    private void reportFatal(final Throwable t) {
+        // Runs on the GL thread — hop to the UI thread before touching any View.
+        if (driver instanceof com.deadzone.core.Game) {
+            android.app.Activity act = ((com.deadzone.core.Game) driver).act;
+            if (act instanceof com.deadzone.MainActivity) {
+                act.runOnUiThread(new Runnable() {
+                    @Override public void run() { ((com.deadzone.MainActivity) act).showFatal(t); }
+                });
+            }
+        }
+    }
+
+    private void onSurfaceCreatedInner(GL10 gl, EGLConfig config) {
         com.deadzone.core.Boot.log("GL surface: "
                 + GLES30.glGetString(GLES30.GL_RENDERER) + " / "
                 + GLES30.glGetString(GLES30.GL_VERSION));
@@ -179,14 +203,22 @@ public class Renderer implements GLSurfaceView.Renderer {
     }
 
     @Override public void onSurfaceChanged(GL10 gl, int width, int height) {
-        this.w = width; this.h = height;
-        GLES30.glViewport(0, 0, width, height);
-        bind6(vaoDyn, vboDyn);
-        bind6(vaoStatic, vboStatic);
-        bind7(vaoLine, vboLine);
+        if (fatal) return;
+        try {
+            this.w = width; this.h = height;
+            GLES30.glViewport(0, 0, width, height);
+            bind6(vaoDyn, vboDyn);
+            bind6(vaoStatic, vboStatic);
+            bind7(vaoLine, vboLine);
+        } catch (Throwable t) {
+            fatal = true;
+            android.util.Log.e("DEADZONE", "gl surface changed error", t);
+            reportFatal(t);
+        }
     }
 
     @Override public void onDrawFrame(GL10 gl) {
+        if (fatal) return; // surface/context is broken; error screen already requested
         frames++;
         if (frames == 1 || frames == 60 || frames % 600 == 0)
             com.deadzone.core.Boot.log("GL frame " + frames + " drawn");
@@ -391,4 +423,4 @@ public class Renderer implements GLSurfaceView.Renderer {
         lines[o + 3] = r; lines[o + 4] = g; lines[o + 5] = b; lines[o + 6] = a;
         lineCount += 2;
     }
-}
+            }
