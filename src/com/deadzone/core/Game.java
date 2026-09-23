@@ -93,7 +93,13 @@ public class Game implements Host, Renderer.Driver {
     public View buildUi() {
         GLSurfaceView gl = new GLSurfaceView(act);
         gl.setEGLContextClientVersion(3);
-        gl.setEGLConfigChooser(8, 8, 8, 8, 24, 0); // explicit depth — some GPUs under-choose
+        // No alpha channel is ever used (glClearColor always writes 1.0), and requiring
+        // one (8,8,8,8,24,0) makes some GPUs/drivers fail to find a matching EGL config,
+        // which kills the GL thread before onSurfaceCreated ever runs — silent black
+        // screen with nothing to catch it. Ask for RGB + 24-bit depth only, and let
+        // GLSurfaceView's default chooser fall back gracefully if 24-bit depth is
+        // unavailable, instead of throwing.
+        gl.setEGLConfigChooser(8, 8, 8, 0, 24, 0);
         rend = new Renderer(this);
         gl.setRenderer(rend);
         gl.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
