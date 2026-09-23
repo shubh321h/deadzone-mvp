@@ -220,7 +220,10 @@ public class Renderer implements GLSurfaceView.Renderer {
     @Override public void onDrawFrame(GL10 gl) {
         if (fatal) return; // surface/context is broken; error screen already requested
         frames++;
-        if (frames == 1 || frames == 60 || frames % 600 == 0)
+        // Only log the first couple of seconds worth of heartbeats — enough to
+        // confirm rendering started without the log (and its on-screen overlay)
+        // growing forever while the game is being played.
+        if (frames == 1 || frames == 60 || frames == 180)
             com.deadzone.core.Boot.log("GL frame " + frames + " drawn");
         long now = System.nanoTime();
         float dt = (now - lastNs) / 1e9f;
@@ -423,4 +426,4 @@ public class Renderer implements GLSurfaceView.Renderer {
         lines[o + 3] = r; lines[o + 4] = g; lines[o + 5] = b; lines[o + 6] = a;
         lineCount += 2;
     }
-            }
+}
