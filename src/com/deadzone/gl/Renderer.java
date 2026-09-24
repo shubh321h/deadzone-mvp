@@ -236,6 +236,7 @@ public class Renderer implements GLSurfaceView.Renderer {
     private long lastNs;
     private float timeS;
     private int frames;
+    private boolean fatal; // GL context is broken; error screen requested
 
     public Renderer(Driver driver) { this.driver = driver; }
 
@@ -415,6 +416,16 @@ public class Renderer implements GLSurfaceView.Renderer {
 
     @Override public void onDrawFrame(GL10 gl) {
         if (fatal) return; // surface/context is broken; error screen already requested
+        try {
+            onDrawFrameInner(gl);
+        } catch (Throwable t) {
+            fatal = true;
+            android.util.Log.e("DEADZONE", "gl frame error", t);
+            reportFatal(t);
+        }
+    }
+
+    private void onDrawFrameInner(GL10 gl) {
         frames++;
         // Only log the first couple of seconds worth of heartbeats — enough to
         // confirm rendering started without the log (and its on-screen overlay)

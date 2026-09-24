@@ -116,7 +116,10 @@ public class Game implements Host, Renderer.Driver {
             frameInner(dt, r);
         } catch (Throwable t) {
             android.util.Log.e("DEADZONE", "gl frame error", t);
-            try { ((MainActivity) act).showFatal(t); } catch (Throwable ignored) { }
+            // GL thread — hop to the UI thread before touching views
+            act.runOnUiThread(new Runnable() { @Override public void run() {
+                try { ((MainActivity) act).showFatal(t); } catch (Throwable ignored) { }
+            }});
         }
     }
 
