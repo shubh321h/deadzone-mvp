@@ -82,8 +82,8 @@ public class Renderer implements GLSurfaceView.Renderer {
         "  float m = clamp(vMat, 0.0, 3.0);\n" +
         "  vec2 tile = vec2(mod(m,2.0), floor(m/2.0));\n" +
         "  vec2 auv = tile * 0.5 + fract(vUV) * 0.496 + 0.002;\n" +
-        "  vec3 tex = texture(uAtlas, auv).rgb * (2.0/255.0) * 4.0;\n" + // atlas stored dim; normalize
-        "  vec3 alb = vCol * tex;\n" +
+        "  vec3 tex = texture(uAtlas, auv).rgb;\n" + // atlas stored 0..1
+        "  vec3 alb = vCol * (0.6 + 0.8 * tex);\n" +
         // ---- lighting: wrap diffuse sun + hemispheric ambient ----
         "  vec3 N = normalize(vNrm);\n" +
         "  float ndl = dot(N, uSunDir);\n" +
@@ -166,10 +166,10 @@ public class Renderer implements GLSurfaceView.Renderer {
     // 0 Mumbai storm, 1 Delhi dust, 2 Ladakh alpine, 3 interior dim
     private static final float[][] PRESET = {
         // zen(r,g,b) hor(r,g,b) sun(r,g,b) ambT ambB        | sunDir x,y,z
-        {0.045f,0.065f,0.100f,  0.150f,0.190f,0.235f,  0.75f,0.82f,0.88f,  0.36f,0.41f,0.50f,  0.15f,0.15f,0.16f,  -0.35f,-0.80f,-0.30f},
-        {0.100f,0.105f,0.135f,  0.440f,0.360f,0.260f,  1.10f,0.97f,0.80f,  0.46f,0.44f,0.42f,  0.24f,0.21f,0.17f,  -0.30f,-0.76f,-0.25f},
-        {0.110f,0.175f,0.300f,  0.540f,0.610f,0.710f,  1.25f,1.22f,1.15f,  0.50f,0.55f,0.65f,  0.46f,0.50f,0.58f,  -0.25f,-0.85f,-0.15f},
-        {0.030f,0.032f,0.038f,  0.200f,0.175f,0.150f,  0.65f,0.58f,0.48f,  0.44f,0.39f,0.33f,  0.17f,0.15f,0.13f,  -0.20f,-0.90f,-0.10f},
+        {0.045f,0.065f,0.100f,  0.150f,0.190f,0.235f,  0.70f,0.78f,0.85f,  0.36f,0.41f,0.50f,  0.15f,0.15f,0.16f,  -0.35f,0.80f,-0.30f},
+        {0.100f,0.105f,0.135f,  0.440f,0.360f,0.260f,  1.05f,0.93f,0.78f,  0.46f,0.44f,0.42f,  0.24f,0.21f,0.17f,  -0.30f,0.76f,-0.25f},
+        {0.110f,0.175f,0.300f,  0.540f,0.610f,0.710f,  1.20f,1.17f,1.10f,  0.50f,0.55f,0.65f,  0.46f,0.50f,0.58f,  -0.25f,0.85f,-0.15f},
+        {0.030f,0.032f,0.038f,  0.200f,0.175f,0.150f,  0.60f,0.54f,0.45f,  0.44f,0.39f,0.33f,  0.17f,0.15f,0.13f,  -0.20f,0.90f,-0.10f},
     };
 
     // ---------------- MSAA config chooser ----------------

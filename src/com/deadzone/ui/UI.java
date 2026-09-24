@@ -192,6 +192,7 @@ public class UI {
         @Override public boolean onTouchEvent(MotionEvent e) {
             switch (e.getActionMasked()) {
                 case MotionEvent.ACTION_DOWN:
+                    if (screen == S_NONE) return false; // let touches reach the game HUD
                     downX = e.getX(); downY = e.getY();
                     downScroll = scrollY; panning = false;
                     return true;
