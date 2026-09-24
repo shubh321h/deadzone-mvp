@@ -47,6 +47,11 @@ public class UI {
         panels = new FrameLayout(ctx);
         panels.setLayoutParams(new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        // Some devices (observed: Moto G85 / Adreno 619) skip nested panel
+        // children on the HW-accelerated path — background draws, content
+        // doesn't. Software layer always renders the full subtree; menus are
+        // static text, so CPU cost is a non-issue.
+        panels.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
 
         menu = menuPanel(ctx);
         missions = missionsPanel(ctx);
@@ -134,20 +139,31 @@ public class UI {
 
     // ---------------- main menu ----------------
 
+    public int menuContentW = -1, menuContentH = -1; // measured, for boot log
+
     private View menuPanel(Context ctx) {
-        FrameLayout f = panelBg();
-        try { // HD key art baked into the panel BACKGROUND — backgrounds always
-              // render behind content; no child stacking / z-order involved
+        // mirrors the boot-log overlay structure (ScrollView > LinearLayout >
+        // TextViews) — that structure demonstrably renders on every device
+        ScrollView sv = new ScrollView(ctx);
+        sv.setFillViewport(true);
+        sv.setLayoutParams(new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        try { // HD key art baked into the scroll container's background
             android.graphics.Bitmap bmp = android.graphics.BitmapFactory.decodeFile(
                     new java.io.File(com.deadzone.data.DataLib.assetDir(), "menu_bg.jpg").getAbsolutePath());
             if (bmp != null) {
                 android.graphics.Bitmap scrimmed = bmp.copy(bmp.getConfig(), true);
                 new android.graphics.Canvas(scrimmed).drawColor(0x8F0B1118);
-                f.setBackground(new android.graphics.drawable.BitmapDrawable(
+                sv.setBackground(new android.graphics.drawable.BitmapDrawable(
                         ctx.getResources(), scrimmed));
             }
         } catch (Exception ignored) { }
-        LinearLayout c = col(dp(20));
+        LinearLayout c = new LinearLayout(g.act);
+        c.setOrientation(LinearLayout.VERTICAL);
+        c.setGravity(Gravity.CENTER);
+        c.setPadding(dp(20), dp(20), dp(20), dp(20));
+        c.setLayoutParams(new ScrollView.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         TextView title = tv(54, 0xFFE8FFE8);
         title.setText("DEAD ZONE");
         title.setTypeface(Typeface.DEFAULT_BOLD);
@@ -179,9 +195,12 @@ public class UI {
         c.addView(spacer(dp(14)));
         TextView foot = dim("100% OFFLINE  •  NO ADS  •  NO IAP", 11);
         c.addView(foot);
-        f.addView(c);
+        sv.addView(c);
+        c.post(new Runnable() { @Override public void run() {
+            menuContentW = c.getWidth(); menuContentH = c.getHeight();
+        }});
         com.deadzone.core.Boot.log("menuPanel: " + c.getChildCount() + " content views built");
-        return f;
+        return sv;
     }
 
     private View spacer(int h) {
