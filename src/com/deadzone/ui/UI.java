@@ -62,7 +62,7 @@ public class UI {
             }
         } catch (Exception ignored) { }
 
-        menu = menuPanel(ctx);
+        menu = new MenuView(ctx);
         missions = missionsPanel(ctx);
         weapons = weaponsPanel(ctx);
         survivor = survivorPanel(ctx);
@@ -148,53 +148,105 @@ public class UI {
 
     // ---------------- main menu ----------------
 
-    public int menuContentW = -1, menuContentH = -1; // measured, for boot log
+    public int menuContentW = -1, menuContentH = -1;
 
-    private View menuPanel(Context ctx) {
-        // NO ScrollView, NO image children — structurally identical to the
-        // safehouse panel, which demonstrably renders on every device tried.
-        // Key art shows through from the panels-container background.
-        FrameLayout f = new FrameLayout(ctx);
-        f.setLayoutParams(new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-        LinearLayout c = col(dp(16));
-        TextView title = tv(44, 0xFFE8FFE8);
-        title.setText("DEAD ZONE");
-        title.setTypeface(Typeface.DEFAULT_BOLD);
-        c.addView(title);
-        TextView sub = dim("v" + g.versionName() + "  •  "
-                + g.data.missions.length + " missions  •  "
-                + g.data.enemies.size() + " infected types", 13);
-        c.addView(sub);
-        c.addView(spacer(dp(12)));
-        String cont = g.hasSave ? "CONTINUE" : "NEW GAME";
-        c.addView(btn(cont, 20, ACCENT, new Runnable() {
-            @Override public void run() { g.toSafehouse(); }
-        }));
-        c.addView(btn("MISSIONS", 20, 0xFFFFFFFF, new Runnable() {
-            @Override public void run() { g.toSafehouse(); showMissions(); }
-        }));
-        c.addView(btn("WEAPONS", 20, 0xFFFFFFFF, new Runnable() {
-            @Override public void run() { showWeapons(); }
-        }));
-        c.addView(btn("SURVIVOR", 20, 0xFFFFFFFF, new Runnable() {
-            @Override public void run() { showSurvivor(); }
-        }));
-        c.addView(btn("INVENTORY", 20, 0xFFFFFFFF, new Runnable() {
-            @Override public void run() { showInventory(); }
-        }));
-        c.addView(btn("SETTINGS", 20, 0xFFFFFFFF, new Runnable() {
-            @Override public void run() { showSettings(); }
-        }));
-        c.addView(spacer(dp(10)));
-        TextView foot = dim("100% OFFLINE  •  NO ADS  •  NO IAP", 11);
-        c.addView(foot);
-        f.addView(c);
-        c.post(new Runnable() { @Override public void run() {
-            menuContentW = c.getWidth(); menuContentH = c.getHeight();
-        }});
-        com.deadzone.core.Boot.log("menuPanel: " + c.getChildCount() + " content views built");
-        return f;
+    /**
+     * Fully self-drawn main menu. NO child views, NO layout machinery —
+     * every pixel (art, title, buttons) is one custom onDraw(). Motivated
+     * by a device (Moto G85 / Adreno 619) that intermittently refuses to
+     * draw or measure nested widget subtrees; plain Canvas output is the
+     * one path that never failed there (it is what the boot log uses).
+     */
+    private class MenuView extends View {
+        private android.graphics.Bitmap art;
+        private class Item { String label; Runnable action; android.graphics.RectF rect = new android.graphics.RectF(); }
+        private final java.util.ArrayList<Item> items = new java.util.ArrayList<Item>();
+        private final android.graphics.Paint pText = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+        private final android.graphics.Paint pBtn = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+        private final android.graphics.Paint pBtnBg = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+
+        MenuView(Context c) {
+            super(c);
+            try {
+                android.graphics.Bitmap bmp = android.graphics.BitmapFactory.decodeFile(
+                        new java.io.File(com.deadzone.data.DataLib.assetDir(), "menu_bg.jpg").getAbsolutePath());
+                if (bmp != null) {
+                    android.graphics.Bitmap scrimmed = bmp.copy(bmp.getConfig(), true);
+                    new android.graphics.Canvas(scrimmed).drawColor(0x8F0B1118);
+                    art = scrimmed;
+                }
+            } catch (Exception ignored) { }
+            String cont = g.hasSave ? "CONTINUE" : "NEW GAME";
+            items.add(item(cont, new Runnable() { @Override public void run() { g.toSafehouse(); } }));
+            items.add(item("MISSIONS", new Runnable() { @Override public void run() { g.toSafehouse(); showMissions(); } }));
+            items.add(item("WEAPONS", new Runnable() { @Override public void run() { showWeapons(); } }));
+            items.add(item("SURVIVOR", new Runnable() { @Override public void run() { showSurvivor(); } }));
+            items.add(item("INVENTORY", new Runnable() { @Override public void run() { showInventory(); } }));
+            items.add(item("SETTINGS", new Runnable() { @Override public void run() { showSettings(); } }));
+        }
+
+        private Item item(String label, Runnable action) {
+            Item it = new Item(); it.label = label; it.action = action; return it;
+        }
+
+        @Override protected void onSizeChanged(int w, int h, int ow, int oh) {
+            super.onSizeChanged(w, h, ow, oh);
+            menuContentW = w; menuContentH = h;
+            float d = dpf(1);
+            float bw = Math.min(w * 0.62f, d * 340), bh = d * 46;
+            float y0 = h * 0.46f, gap = d * 10;
+            for (Item it : items) {
+                it.rect.set(w / 2f - bw / 2f, y0, w / 2f + bw / 2f, y0 + bh);
+                y0 += bh + gap;
+            }
+            com.deadzone.core.Boot.log("MenuView sized " + w + "x" + h
+                    + " buttons=" + items.size() + " firstBtn=" + (items.isEmpty() ? "-" : items.get(0).rect.toString()));
+        }
+
+        @Override protected void onDraw(android.graphics.Canvas c) {
+            super.onDraw(c);
+            float w = getWidth(), h = getHeight(), d = dpf(1);
+            if (art != null) { // center-crop draw
+                float as = Math.max(w / art.getWidth(), h / art.getHeight());
+                float dw = art.getWidth() * as, dh = art.getHeight() * as;
+                c.drawBitmap(art, (w - dw) / 2f, (h - dh) / 2f, null);
+            } else { c.drawColor(BG); }
+            pText.setTextSize(46 * d); pText.setFakeBoldText(true); pText.setColor(0xFFE8FFE8);
+            c.drawText("DEAD ZONE", w / 2f - pText.measureText("DEAD ZONE") / 2f, h * 0.20f, pText);
+            String sub = "v" + g.versionName() + "  \u2022  " + g.data.missions.length
+                    + " missions  \u2022  " + g.data.enemies.size() + " infected types";
+            pText.setTextSize(13 * d); pText.setFakeBoldText(false); pText.setColor(DIM);
+            c.drawText(sub, w / 2f - pText.measureText(sub) / 2f, h * 0.20f + 30 * d, pText);
+            for (Item it : items) {
+                android.graphics.RectF r = it.rect;
+                pBtnBg.setColor(it == items.get(0) ? 0x407CFC66 : 0x33111A24);
+                c.drawRoundRect(r, 10 * d, 10 * d, pBtnBg);
+                pText.setTextSize(18 * d); pText.setFakeBoldText(true);
+                pText.setColor(it == items.get(0) ? ACCENT : 0xFFFFFFFF);
+                c.drawText(it.label, r.centerX() - pText.measureText(it.label) / 2f,
+                        r.centerY() + 6 * d, pText);
+            }
+            pText.setTextSize(10 * d); pText.setFakeBoldText(false); pText.setColor(DIM);
+            String foot = "100% OFFLINE  \u2022  NO ADS  \u2022  NO IAP";
+            c.drawText(foot, w / 2f - pText.measureText(foot) / 2f, h - 14 * d, pText);
+        }
+
+        @Override public boolean onTouchEvent(android.view.MotionEvent e) {
+            if (e.getAction() == android.view.MotionEvent.ACTION_UP) {
+                for (Item it : items)
+                    if (it.rect.contains(e.getX(), e.getY())) {
+                        g.audio.play("ui");
+                        performClick();
+                        it.action.run();
+                        return true;
+                    }
+            }
+            return true;
+        }
+
+        @Override public boolean performClick() { return super.performClick(); }
+
+        private float dpf(int v) { return v * g.act.getResources().getDisplayMetrics().density; }
     }
 
     private View spacer(int h) {
