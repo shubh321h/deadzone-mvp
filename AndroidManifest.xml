@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.deadzone"
     android:versionCode="1"
-    android:versionName="0.4.2-HD">
+    android:versionName="0.4.3-HD">
 
     <uses-sdk android:minSdkVersion="24" android:targetSdkVersion="34"/>
     <uses-feature android:glEsVersion="0x00030000" android:required="true"/>
