@@ -31,8 +31,7 @@ public class MainActivity extends Activity {
             final MainActivity me = this;
             root.postDelayed(new Runnable() { @Override public void run() {
                 Boot.log("t+3s menu visible=" + game.ui.anyVisible()
-                        + " panels=" + game.ui.panels.getWidth() + "x" + game.ui.panels.getHeight()
-                        + " children=" + game.ui.panels.getChildCount()
+                        + " panel=" + game.ui.panels.getWidth() + "x" + game.ui.panels.getHeight()
                         + " menuCol=" + game.ui.menuContentW + "x" + game.ui.menuContentH);
                 Boot.flush(me);
             }}, 3000);
