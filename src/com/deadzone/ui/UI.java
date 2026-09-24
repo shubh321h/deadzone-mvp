@@ -135,7 +135,25 @@ public class UI {
     // ---------------- main menu ----------------
 
     private View menuPanel(Context ctx) {
-        FrameLayout f = panelBg();
+        FrameLayout f = new FrameLayout(ctx);
+        f.setLayoutParams(new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        f.setBackgroundColor(BG);
+        try { // HD key art background
+            android.widget.ImageView bg = new android.widget.ImageView(ctx);
+            android.graphics.Bitmap bmp = android.graphics.BitmapFactory.decodeFile(
+                    new java.io.File(com.deadzone.data.DataLib.assetDir(), "menu_bg.jpg").getAbsolutePath());
+            if (bmp != null) {
+                bg.setImageBitmap(bmp);
+                bg.setScaleType(android.widget.ImageView.ScaleType.CENTER_CROP);
+                f.addView(bg, new FrameLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+                View scrim = new View(ctx);
+                scrim.setBackgroundColor(0x8F0B1118);
+                f.addView(scrim, new FrameLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+            }
+        } catch (Exception ignored) { }
         LinearLayout c = col(dp(20));
         TextView title = tv(54, 0xFFE8FFE8);
         title.setText("DEAD ZONE");

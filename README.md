@@ -117,10 +117,9 @@ per-frame charge damage on the boss (now one hit per charge).
 
 ## Status
 
-0.3.0-LADAKH — three-chapter campaign: Mumbai (5) + Delhi (4, Alpha Colossus)
-+ Ladakh (3, Subject Zero at the KX-7 array under the glacier). Ladakh is a
-snow region variant (own seed, white ground, slate/monastery palette, array
-campus layout). The region system is fully data-driven (`region` field) — the
-roadmap cities (Bengaluru, Darjeeling) are now content-only work. 207 smoke
-checks, ~10/12 full-sweep green. Builds to a signed ~0.9 MB APK.
-Next: playtest polish, safehouse epilogue screen, game-pad remapping.
+0.4.0-HD — the full three-chapter campaign (Mumbai / Delhi / Ladakh, 12
+missions, 3 bosses) now on the HD render path: textured material atlas
+(asphalt / concrete / metal / rust), sun + sky lighting with per-region
+atmospheres, procedural emissive windows on level geometry, procedural sky
+dome with sun glow, 4x MSAA, HD launcher icons and key-art main menu.
+207 smoke checks, ~10/12 full-sweep green.

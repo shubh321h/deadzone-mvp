@@ -93,6 +93,13 @@ public class DataLib {
         }
     }
 
+    /** Where extracted asset copies live (atlas/menu art read from here). */
+    public static java.io.File assetDir() {
+        return filesDir;
+    }
+
+    private static java.io.File filesDir;
+
     /** JVM side (smoke tests). */
     public static DataLib loadFromDir(File dir) {
         DataLib d = new DataLib();
@@ -140,12 +147,24 @@ public class DataLib {
                     throw new RuntimeException("asset copy failed: " + f, e);
                 }
             }
+            for (String f : new String[]{"atlas.png", "menu_bg.jpg"}) {
+                try {
+                    InputStream in = ctx.getAssets().open(f);
+                    java.io.FileOutputStream out = new java.io.FileOutputStream(new File(dir, f));
+                    byte[] buf = new byte[8192];
+                    int n;
+                    while ((n = in.read(buf)) > 0) out.write(buf, 0, n);
+                    out.close();
+                    in.close();
+                } catch (Exception ignored) { }
+            }
             try {
                 java.io.FileWriter vw = new java.io.FileWriter(vf);
                 vw.write(ver);
                 vw.close();
             } catch (Exception ignored) { }
         }
+        filesDir = dir;
         DataLib d = new DataLib();
         d.loadAll(dir);
         return d;

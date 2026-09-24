@@ -90,6 +90,7 @@ public class World {
         }
 
         r.beginStatic();
+        r.setMaterial(0);
         // ground: wet asphalt in Mumbai, dry dust in Delhi, snow in Ladakh
         float gc = flood ? 0.13f : ("delhi".equals(region) ? 0.15f : 0.10f);
         if ("ladakh".equals(region))
@@ -102,12 +103,18 @@ public class World {
             r.addBox(0, 0.06f, -102, 0, 0, 280, 0.22f, 46, 0.05f, 0.08f, 0.12f); // flooded north strip
         }
 
+        r.setMaterial(1);
         drawBuildings(r);
+        r.setMaterial(2);
         drawSafehouseTower(r);
+        r.setMaterial(1);
         drawMarket(r);
+        r.setMaterial(3);
         drawCamp(r);
-        if ("mumbai".equals(region)) drawDocks(r); // dockyard is Mumbai-only visual
+        if ("mumbai".equals(region)) { r.setMaterial(2); drawDocks(r); } // Mumbai dockyard
+        r.setMaterial(2);
         drawStation(r);
+        r.setMaterial(3);
         drawStreetProps(r);
         r.endStatic();
         if (graph != null) graph.markBlocked(this);

@@ -93,7 +93,7 @@ public class Game implements Host, Renderer.Driver {
     public View buildUi() {
         GLSurfaceView gl = new GLSurfaceView(act);
         gl.setEGLContextClientVersion(3);
-        gl.setEGLConfigChooser(8, 8, 8, 8, 24, 0); // explicit depth — some GPUs under-choose
+        gl.setEGLConfigChooser(new Renderer.MsaaChooser()); // 4x MSAA when available
         rend = new Renderer(this);
         gl.setRenderer(rend);
         gl.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
@@ -158,11 +158,14 @@ public class Game implements Host, Renderer.Driver {
     private void render(Renderer r) {
         float aspect = r.w / (float) Math.max(1, r.h);
         if (state == ST_MISSION || state == ST_DEAD || state == ST_PAUSED || state == ST_RESULTS) {
-            r.begin(0.03f, 0.045f, 0.08f);
+            r.begin(0, 0, 0);
+            r.atmosphere("delhi".equals(world.region) ? 1
+                    : ("ladakh".equals(world.region) ? 2 : 0));
             r.setCam(player.camPos.x, player.camPos.y, player.camPos.z, drawDist());
             float[] vp = player.viewProj(aspect, player.wcur(this).adsFov,
                     input.state.sprint && input.state.joyY > 0.2f);
             r.setVP(vp);
+            r.drawSky();
             player.draw(r, this);
             for (Zombie z : zombiesList)
                 if (z.alive) z.draw(r, simT);
@@ -174,9 +177,11 @@ public class Game implements Host, Renderer.Driver {
             safeCam += 0.008f;
             Vec3 eye = new Vec3((float) Math.cos(safeCam) * 9f, 3.4f, (float) Math.sin(safeCam) * 9f);
             Vec3 center = new Vec3(0, 1.1f, 0);
-            r.begin(0.055f, 0.048f, 0.04f);
+            r.begin(0, 0, 0);
+            r.atmosphere(3);
             r.setCam(eye.x, eye.y, eye.z, 70f);
             r.setLookVP(eye, center, new Vec3(0, 1, 0), 55f);
+            r.drawSky();
             player.draw(r, this);
             fx.draw(r, eye, 0, false);
             r.end();
