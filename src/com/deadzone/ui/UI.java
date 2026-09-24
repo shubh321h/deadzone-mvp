@@ -135,23 +135,16 @@ public class UI {
     // ---------------- main menu ----------------
 
     private View menuPanel(Context ctx) {
-        FrameLayout f = new FrameLayout(ctx);
-        f.setLayoutParams(new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-        f.setBackgroundColor(BG);
-        try { // HD key art background
-            android.widget.ImageView bg = new android.widget.ImageView(ctx);
+        FrameLayout f = panelBg();
+        try { // HD key art baked into the panel BACKGROUND — backgrounds always
+              // render behind content; no child stacking / z-order involved
             android.graphics.Bitmap bmp = android.graphics.BitmapFactory.decodeFile(
                     new java.io.File(com.deadzone.data.DataLib.assetDir(), "menu_bg.jpg").getAbsolutePath());
             if (bmp != null) {
-                bg.setImageBitmap(bmp);
-                bg.setScaleType(android.widget.ImageView.ScaleType.CENTER_CROP);
-                f.addView(bg, new FrameLayout.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-                View scrim = new View(ctx);
-                scrim.setBackgroundColor(0x8F0B1118);
-                f.addView(scrim, new FrameLayout.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+                android.graphics.Bitmap scrimmed = bmp.copy(bmp.getConfig(), true);
+                new android.graphics.Canvas(scrimmed).drawColor(0x8F0B1118);
+                f.setBackground(new android.graphics.drawable.BitmapDrawable(
+                        ctx.getResources(), scrimmed));
             }
         } catch (Exception ignored) { }
         LinearLayout c = col(dp(20));
@@ -184,9 +177,10 @@ public class UI {
             @Override public void run() { showSettings(); }
         }));
         c.addView(spacer(dp(14)));
-        TextView foot = dim("v0.1 MVP  •  100% OFFLINE  •  NO IN-APP PURCHASES", 11);
+        TextView foot = dim("100% OFFLINE  •  NO ADS  •  NO IAP", 11);
         c.addView(foot);
         f.addView(c);
+        com.deadzone.core.Boot.log("menuPanel: " + c.getChildCount() + " content views built");
         return f;
     }
 
