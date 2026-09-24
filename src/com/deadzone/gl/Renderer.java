@@ -242,6 +242,28 @@ public class Renderer implements GLSurfaceView.Renderer {
     // ---------------- GL lifecycle ----------------
 
     @Override public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+        try {
+            onSurfaceCreatedInner(gl, config);
+        } catch (Throwable t) {
+            fatal = true;
+            android.util.Log.e("DEADZONE", "gl surface create error", t);
+            reportFatal(t);
+        }
+    }
+
+    private void reportFatal(final Throwable t) {
+        // Runs on the GL thread — hop to the UI thread before touching any View.
+        if (driver instanceof com.deadzone.core.Game) {
+            android.app.Activity act = ((com.deadzone.core.Game) driver).act;
+            if (act instanceof com.deadzone.MainActivity) {
+                act.runOnUiThread(new Runnable() {
+                    @Override public void run() { ((com.deadzone.MainActivity) act).showFatal(t); }
+                });
+            }
+        }
+    }
+
+    private void onSurfaceCreatedInner(GL10 gl, EGLConfig config) {
         com.deadzone.core.Boot.log("GL surface: "
                 + GLES30.glGetString(GLES30.GL_RENDERER) + " / "
                 + GLES30.glGetString(GLES30.GL_VERSION));
@@ -392,8 +414,12 @@ public class Renderer implements GLSurfaceView.Renderer {
     }
 
     @Override public void onDrawFrame(GL10 gl) {
+        if (fatal) return; // surface/context is broken; error screen already requested
         frames++;
-        if (frames == 1 || frames == 60 || frames % 600 == 0)
+        // Only log the first couple of seconds worth of heartbeats — enough to
+        // confirm rendering started without the log (and its on-screen overlay)
+        // growing forever while the game is being played.
+        if (frames == 1 || frames == 60 || frames == 180)
             com.deadzone.core.Boot.log("GL frame " + frames + " drawn");
         long now = System.nanoTime();
         float dt = (now - lastNs) / 1e9f;

@@ -503,4 +503,4 @@ public class Game implements Host, Renderer.Driver {
     public int drawDist() { return quality == 0 ? 70 : quality == 1 ? 110 : 150; }
     public int rainCount() { return quality == 0 ? 0 : quality == 1 ? 140 : 220; }
     public int zCap() { return quality == 0 ? 24 : quality == 1 ? 36 : 48; }
-}
+                     }
